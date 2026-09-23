@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { Analytics } from "@vercel/analytics/react";
 import Cookies from "js-cookie";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Attendance from "./components/attendance/Attendance";
@@ -76,6 +77,7 @@ function App() {
 				)}
 			</div>
 			<Footer />
+			<Analytics />
 		</div>
 	);
 }
