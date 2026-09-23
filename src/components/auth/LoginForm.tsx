@@ -144,7 +144,7 @@ function LoginForm() {
 			Cookies.remove(STUDENT_ID_COOKIE_NAME);
 		}
 
-		setToken(token, 1 / 24);
+		setToken(token, COOKIE_EXPIRY);
 		Cookies.set(USERNAME_COOKIE_NAME, submitted.username, {
 			expires: COOKIE_EXPIRY,
 		});

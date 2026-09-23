@@ -43,13 +43,16 @@ function App() {
 
 	useEffect(() => {
 		if (attendanceQuery.isError) {
-			toast.error(
+			const message =
 				attendanceQuery.error instanceof Error
 					? attendanceQuery.error.message
-					: "Failed to load attendance data.",
-			);
+					: "Failed to load attendance data.";
+			toast.error(message);
+			if (message === "Session expired. Please login again.") {
+				clearToken();
+			}
 		}
-	}, [attendanceQuery.isError, attendanceQuery.error, toast]);
+	}, [attendanceQuery.isError, attendanceQuery.error, toast, clearToken]);
 
 	const handleLogout = useCallback(() => {
 		queryClient.removeQueries({ queryKey: attendanceQueryKey(token) });
