@@ -39,7 +39,6 @@
 	width: calc(50% - 4px);
 	border-radius: $clay-radius-pill;
 	background: linear-gradient(160deg, #4c94f7 0%, $clay-accent 100%);
-	box-shadow: $shadow-sm;
 	transition: left 0.2s ease-in-out;
 
 	&--right {

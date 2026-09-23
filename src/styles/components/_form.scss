@@ -5,18 +5,15 @@
 	padding: 0.75rem 1rem;
 	color: $clay-text;
 	@include clay-inset($clay-radius-pill);
-	transition: box-shadow 0.2s ease;
+	transition: outline-color 0.2s ease;
 
 	&::placeholder {
 		color: $clay-text-muted;
 	}
 
 	&:focus {
-		outline: none;
-		box-shadow:
-			inset 3px 3px 6px $clay-shadow-dark,
-			inset -3px -3px 6px $clay-shadow-light,
-			0 0 0 3px rgba($clay-accent, 0.35);
+		outline: 3px solid rgba($clay-accent, 0.35);
+		outline-offset: 1px;
 	}
 
 	&--with-icon {
@@ -24,10 +21,9 @@
 	}
 
 	&.is-invalid {
-		box-shadow:
-			inset 3px 3px 6px $clay-shadow-dark,
-			inset -3px -3px 6px $clay-shadow-light,
-			0 0 0 3px rgba($color-danger-text, 0.3);
+		border-color: rgba($color-danger-text, 0.5);
+		outline: 3px solid rgba($color-danger-text, 0.3);
+		outline-offset: 1px;
 	}
 }
 

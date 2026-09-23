@@ -28,26 +28,17 @@ $font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, sans-seri
 $enable-shadows: false;
 
 // ---- Claymorphism design tokens (not part of Bootstrap's variable set) ----
-// Soft, puffy surfaces: a dual-tone shadow (dark below-right, light above-left)
-// standing in for the hard borders a flatter design would use.
 $clay-page-gradient: linear-gradient(180deg, #bfe0fb 0%, #dcedfb 35%, #f6fafd 75%, #ffffff 100%);
 $clay-surface: #eef4fb; // base clay color things are "molded" from
 $clay-surface-alt: #ffffff;
 $clay-text: #33415c; // soft navy instead of pure black
 $clay-text-muted: #7c8aa5;
 
-$clay-shadow-light: rgba(255, 255, 255, 0.8);
-$clay-shadow-dark: rgba(163, 177, 198, 0.55);
-
 $clay-radius-sm: 0.9rem;
 $clay-radius-md: 1.25rem;
 $clay-radius-lg: 1.75rem;
 $clay-radius-xl: 2rem;
 $clay-radius-pill: 999px;
-
-$shadow-sm: 4px 4px 8px $clay-shadow-dark, -4px -4px 8px $clay-shadow-light;
-$shadow-md: 8px 8px 16px $clay-shadow-dark, -8px -8px 16px $clay-shadow-light;
-$shadow-lg: 14px 14px 28px $clay-shadow-dark, -10px -10px 22px $clay-shadow-light;
 
 $clay-accent: #3b82f6; // soft blue accent
 $clay-accent-dark: #1f2937; // charcoal used for primary CTAs, like the reference button

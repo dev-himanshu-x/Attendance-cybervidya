@@ -1,4 +1,5 @@
 import { QueryClientProvider } from "@tanstack/react-query";
+import { Analytics } from "@vercel/analytics/react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
@@ -23,5 +24,6 @@ createRoot(rootElement).render(
 				</TargetPercentageProvider>
 			</AuthTokenProvider>
 		</QueryClientProvider>
+		<Analytics />
 	</StrictMode>,
 );

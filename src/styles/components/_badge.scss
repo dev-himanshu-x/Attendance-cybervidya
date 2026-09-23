@@ -1,5 +1,5 @@
 .badge-attendance {
-	@include clay-raised($shadow-sm, $clay-radius-pill);
+	@include clay-raised($clay-radius-pill);
 	@include clay-text;
 	display: inline-flex;
 	align-items: center;
@@ -24,17 +24,14 @@
 	&--neutral {
 		background: $clay-surface;
 		color: $clay-text-muted;
-		box-shadow: none;
 	}
 	&--tinted {
 		background: $color-tinted-bg;
 		color: $color-tinted-text;
-		box-shadow: none;
 	}
 	&--highlight {
 		background: $color-highlight-bg;
 		color: $color-highlight-text;
-		box-shadow: none;
 	}
 	&--sm {
 		font-size: 0.625rem;

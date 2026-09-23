@@ -27,7 +27,7 @@
 	max-height: 85vh;
 	display: flex;
 	flex-direction: column;
-	@include clay-raised($shadow-lg, $clay-radius-lg);
+	@include clay-raised($clay-radius-lg);
 	padding: 1rem;
 
 	@media (min-width: 640px) {

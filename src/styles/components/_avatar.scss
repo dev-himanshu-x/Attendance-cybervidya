@@ -18,9 +18,7 @@
 	background: $clay-surface;
 	font-size: 0.75rem;
 	color: $clay-text-muted;
-	box-shadow:
-		0 0 0 2px #fff,
-		$shadow-sm;
+	border: 2px solid #fff;
 
 	img {
 		width: 100%;

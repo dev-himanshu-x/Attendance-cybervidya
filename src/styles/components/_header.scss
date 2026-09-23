@@ -119,11 +119,8 @@
 		}
 
 		&:focus {
-			outline: none;
-			box-shadow:
-				inset 3px 3px 6px $clay-shadow-dark,
-				inset -3px -3px 6px $clay-shadow-light,
-				0 0 0 3px rgba($clay-accent, 0.35);
+			outline: 3px solid rgba($clay-accent, 0.35);
+			outline-offset: 1px;
 		}
 	}
 }
@@ -150,9 +147,7 @@
 	font-size: 0.875rem;
 	color: #fff;
 	background: linear-gradient(160deg, #4c94f7 0%, $clay-accent 100%);
-	transition:
-		transform 0.2s ease,
-		box-shadow 0.2s ease;
+	transition: transform 0.2s ease;
 	flex-shrink: 0;
 
 	&:hover {
@@ -161,9 +156,6 @@
 
 	&:active {
 		transform: none;
-		box-shadow:
-			inset 3px 3px 6px $clay-shadow-dark,
-			inset -3px -3px 6px $clay-shadow-light;
 	}
 }
 
@@ -220,7 +212,7 @@
 	background: $clay-surface-alt;
 	border-bottom-left-radius: $clay-radius-lg;
 	border-bottom-right-radius: $clay-radius-lg;
-	box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
+	border-bottom: 1px solid rgba(163, 177, 198, 0.25);
 	transform: translateY(-100%);
 	transition: transform 0.25s ease;
 }
@@ -284,11 +276,8 @@
 		}
 
 		&:focus {
-			outline: none;
-			box-shadow:
-				inset 3px 3px 6px $clay-shadow-dark,
-				inset -3px -3px 6px $clay-shadow-light,
-				0 0 0 3px rgba($clay-accent, 0.35);
+			outline: 3px solid rgba($clay-accent, 0.35);
+			outline-offset: 1px;
 		}
 	}
 }

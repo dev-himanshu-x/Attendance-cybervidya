@@ -1,10 +1,5 @@
 .card-panel {
-	@include clay-raised(none, $clay-radius-lg);
-	// clay-raised sets border: none — without a shadow, the white panel has
-	// zero edge definition against the equally-light page gradient, so it
-	// visually merges with the background. A hairline border keeps the
-	// boundary visible without reintroducing the shadow.
-	border: 1px solid rgba(163, 177, 198, 0.25);
+	@include clay-raised($clay-radius-lg);
 	padding: 1rem;
 
 	@media (min-width: 640px) {

@@ -30,9 +30,7 @@
 .alert-callout {
 	padding: 1rem;
 	border-radius: $clay-radius-md;
-	box-shadow:
-		4px 4px 10px $clay-shadow-dark,
-		-4px -4px 10px $clay-shadow-light;
+	border: 1px solid rgba(163, 177, 198, 0.25);
 
 	&--danger {
 		background: #fdecec;

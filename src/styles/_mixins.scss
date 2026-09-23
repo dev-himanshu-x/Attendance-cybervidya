@@ -1,21 +1,19 @@
-// Puffs an element up off the page with a soft dual-tone shadow instead of a
-// hard border — the core claymorphism effect.
-@mixin clay-raised($shadow: $shadow-md, $radius: $clay-radius-md, $surface: $clay-surface-alt) {
-	border: none;
+// Lifts a surface off the page with a hairline border instead of a shadow —
+// keeps edge definition against the equally-light page gradient.
+@mixin clay-raised($radius: $clay-radius-md, $surface: $clay-surface-alt) {
+	border: 1px solid rgba(163, 177, 198, 0.25);
 	border-radius: $radius;
 	background: $surface;
-	box-shadow: $shadow;
+	box-shadow: none;
 }
 
-// The inverse of clay-raised: presses an element into the page, used for
-// inputs and toggle tracks so they read as a groove rather than a bump.
+// The inverse of clay-raised: reads as a groove rather than a bump, used for
+// inputs and toggle tracks. A stronger border stands in for the inset shadow.
 @mixin clay-inset($radius: $clay-radius-md, $surface: $clay-surface) {
-	border: none;
+	border: 1px solid rgba(163, 177, 198, 0.4);
 	border-radius: $radius;
 	background: $surface;
-	box-shadow:
-		inset 3px 3px 6px $clay-shadow-dark,
-		inset -3px -3px 6px $clay-shadow-light;
+	box-shadow: none;
 }
 
 @mixin clay-text {

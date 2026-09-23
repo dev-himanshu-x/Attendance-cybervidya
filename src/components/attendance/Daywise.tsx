@@ -65,52 +65,57 @@ function Daywise({ token, payload }: DaywiseProps) {
 		return <p>No daywise attendance data available.</p>;
 
 	return (
-		<div
-			className="table-scroll--hidden bg-white border border-dark border-2"
-			style={{ maxHeight: "500px", overflow: "auto" }}
-		>
-			<table className="table-brutal mb-0">
-				<thead>
-					<tr>
-						<th>Date</th>
-						<th>Day</th>
-						<th>Time Slot</th>
-						<th>Attendance</th>
-					</tr>
-				</thead>
-				<tbody className={`text-center ${!loading ? "fade-in-opacity" : ""}`}>
-					{loading ? (
-						<>
-							<SkeletonRow />
-							<SkeletonRow />
-							<SkeletonRow />
-							<SkeletonRow />
-						</>
-					) : (
-						lectures.map((lecture) => (
-							<tr key={`${lecture.planLecDate}-${lecture.timeSlot}`}>
-								<td>{formatDate(lecture.planLecDate)}</td>
-								<td>{lecture.dayName.substring(0, 3)}</td>
-								<td className="small">{lecture.timeSlot}</td>
-								<td className="fw-semibold">
-									<Badge
-										size="sm"
-										variant={
-											lecture.attendance === "PRESENT"
-												? "present"
-												: lecture.attendance === "ADJUSTED"
-													? "adjusted"
-													: "absent"
-										}
-									>
-										{lecture.attendance}
-									</Badge>
-								</td>
-							</tr>
-						))
-					)}
-				</tbody>
-			</table>
+		<div>
+			<span className="d-md-none small text-secondary bg-light px-2 py-1 rounded-pill d-inline-block mb-2">
+				Scroll →
+			</span>
+			<div
+				className="table-scroll table-scroll--hidden bg-white"
+				style={{ maxHeight: "500px", overflowY: "auto" }}
+			>
+				<table className="table-brutal mb-0 text-nowrap">
+					<thead>
+						<tr>
+							<th>Date</th>
+							<th>Day</th>
+							<th>Time Slot</th>
+							<th>Attendance</th>
+						</tr>
+					</thead>
+					<tbody className={`text-center ${!loading ? "fade-in-opacity" : ""}`}>
+						{loading ? (
+							<>
+								<SkeletonRow />
+								<SkeletonRow />
+								<SkeletonRow />
+								<SkeletonRow />
+							</>
+						) : (
+							lectures.map((lecture) => (
+								<tr key={`${lecture.planLecDate}-${lecture.timeSlot}`}>
+									<td>{formatDate(lecture.planLecDate)}</td>
+									<td>{lecture.dayName.substring(0, 3)}</td>
+									<td className="small">{lecture.timeSlot}</td>
+									<td className="fw-semibold">
+										<Badge
+											size="sm"
+											variant={
+												lecture.attendance === "PRESENT"
+													? "present"
+													: lecture.attendance === "ADJUSTED"
+														? "adjusted"
+														: "absent"
+											}
+										>
+											{lecture.attendance}
+										</Badge>
+									</td>
+								</tr>
+							))
+						)}
+					</tbody>
+				</table>
+			</div>
 		</div>
 	);
 }
