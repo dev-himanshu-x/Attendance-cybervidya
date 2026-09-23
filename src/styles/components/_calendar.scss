@@ -1,0 +1,274 @@
+.calendar-view__divider-bottom {
+	border-bottom: 1px solid rgba(163, 177, 198, 0.3);
+}
+
+.calendar-view__divider-top {
+	border-top: 1px solid rgba(163, 177, 198, 0.3);
+}
+
+.calendar-view__card {
+	position: relative;
+}
+
+// Soft ambient color wash behind the header — purely decorative, clipped by
+// the card's own overflow: hidden.
+.calendar-view__glow {
+	position: absolute;
+	top: -3rem;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 18rem;
+	height: 10rem;
+	background: radial-gradient(closest-side, rgba($clay-accent, 0.16), transparent);
+	pointer-events: none;
+	z-index: 0;
+}
+
+.calendar-view__title {
+	background: linear-gradient(160deg, $clay-text 20%, $clay-accent 120%);
+	background-clip: text;
+	-webkit-background-clip: text;
+	color: transparent;
+	letter-spacing: -0.01em;
+}
+
+.calendar-view__nav-btn {
+	position: relative;
+	z-index: 1;
+	transition:
+		transform 0.2s ease,
+		box-shadow 0.2s ease,
+		color 0.2s ease,
+		border-color 0.2s ease,
+		background 0.2s ease;
+
+	&:hover {
+		color: #fff;
+		border-color: transparent;
+		background: linear-gradient(155deg, #60a5fa 0%, $clay-accent 100%);
+		box-shadow: 0 6px 14px rgba($clay-accent, 0.4);
+	}
+}
+
+.calendar-view__today-link {
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+	font-size: 0.6875rem;
+	font-weight: 700;
+	color: $clay-accent;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+
+	&:hover {
+		color: $clay-accent-dark;
+	}
+}
+
+.calendar-view__summary {
+	background: linear-gradient(180deg, rgba($clay-accent, 0.05) 0%, transparent 100%);
+}
+
+.calendar-view__attendance-summary {
+	display: flex;
+	align-items: center;
+	gap: 0.625rem;
+}
+
+.calendar-view__attendance-caption {
+	font-size: 0.6875rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.calendar-view__ring {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	filter: drop-shadow(0 3px 6px rgba(31, 41, 55, 0.12));
+}
+
+.calendar-view__ring-progress {
+	transition: stroke-dashoffset 0.6s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+.calendar-view__ring-label {
+	position: absolute;
+	font-size: 0.8125rem;
+	font-weight: 800;
+	color: $clay-text;
+}
+
+.calendar-view__body {
+	padding-top: 0.75rem;
+
+	@media (min-width: 640px) {
+		padding-top: 1rem;
+	}
+}
+
+@keyframes calendarSlideNext {
+	from {
+		opacity: 0;
+		transform: translateX(12px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+@keyframes calendarSlidePrev {
+	from {
+		opacity: 0;
+		transform: translateX(-12px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+.calendar-view__grid {
+	display: grid;
+	gap: 0.25rem;
+
+	@media (min-width: 640px) {
+		gap: 0.375rem;
+	}
+
+	&--next {
+		animation: calendarSlideNext 0.3s ease-out;
+	}
+
+	&--prev {
+		animation: calendarSlidePrev 0.3s ease-out;
+	}
+}
+
+.calendar-view__cell {
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 60%), $clay-surface;
+	border-radius: $clay-radius-sm;
+	min-height: 4rem;
+	transition:
+		background-color 0.15s ease,
+		box-shadow 0.15s ease,
+		transform 0.15s ease;
+
+	@media (min-width: 640px) {
+		min-height: 5.5rem;
+	}
+
+	&--empty {
+		background: transparent;
+	}
+
+	// Sunday (1st column) and Saturday (7th column) get a faint tint so a
+	// week's boundaries are easy to scan at a glance.
+	&:not(&--empty):nth-child(7n + 1),
+	&:not(&--empty):nth-child(7n) {
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 60%),
+			color-mix(in srgb, $clay-accent 6%, $clay-surface);
+	}
+
+	&--today {
+		box-shadow: inset 0 0 0 1.5px rgba($clay-accent-dark, 0.28);
+	}
+
+	&.cursor-pointer:hover,
+	&.cursor-pointer:focus-visible {
+		background: $color-tinted-bg;
+		box-shadow: inset 0 0 0 1.5px rgba($clay-accent, 0.35);
+		transform: translateY(-2px);
+		outline: none;
+	}
+}
+
+.calendar-view__day-num {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 1.75rem;
+	height: 1.75rem;
+	padding: 0 0.25rem;
+	font-size: 0.875rem;
+	border-radius: $clay-radius-pill;
+
+	@media (min-width: 640px) {
+		font-size: 1rem;
+	}
+}
+
+@keyframes calendarTodayPulse {
+	0%,
+	100% {
+		box-shadow:
+			0 3px 8px rgba(31, 41, 55, 0.4),
+			0 0 0 3px rgba($clay-accent, 0.18);
+	}
+	50% {
+		box-shadow:
+			0 3px 8px rgba(31, 41, 55, 0.4),
+			0 0 0 6px rgba($clay-accent, 0.12);
+	}
+}
+
+.calendar-view__today {
+	background: linear-gradient(160deg, #2b3646 0%, $clay-accent-dark 100%);
+	color: #fff;
+	box-shadow:
+		0 3px 8px rgba(31, 41, 55, 0.4),
+		0 0 0 3px rgba($clay-accent, 0.18);
+	animation: calendarTodayPulse 2.4s ease-in-out infinite;
+
+	@media (prefers-reduced-motion: reduce) {
+		animation: none;
+	}
+}
+
+.calendar-view__chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3125rem;
+	font-size: 0.625rem;
+	font-weight: 800;
+	line-height: 1;
+	padding: 0.3125rem 0.5rem;
+	border-radius: $clay-radius-pill;
+	background: rgba(255, 255, 255, 0.55);
+	backdrop-filter: blur(3px);
+	box-shadow: 0 1px 3px rgba(31, 41, 55, 0.08);
+
+	@media (min-width: 640px) {
+		font-size: 0.6875rem;
+		padding: 0.3125rem 0.5625rem;
+	}
+}
+
+.calendar-view__chip-dot {
+	width: 0.4rem;
+	height: 0.4rem;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+.calendar-view__chip--present {
+	color: $color-present-text;
+
+	.calendar-view__chip-dot {
+		background: $color-present-text;
+	}
+}
+
+.calendar-view__chip--absent {
+	color: $color-danger-text;
+
+	.calendar-view__chip-dot {
+		background: $color-danger-text;
+	}
+}

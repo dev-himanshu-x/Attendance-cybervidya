@@ -1,0 +1,46 @@
+.form-control-brutal {
+	display: block;
+	width: 100%;
+	margin-top: 0.25rem;
+	padding: 0.75rem 1rem;
+	color: $clay-text;
+	@include clay-inset($clay-radius-pill);
+	transition: box-shadow 0.2s ease;
+
+	&::placeholder {
+		color: $clay-text-muted;
+	}
+
+	&:focus {
+		outline: none;
+		box-shadow:
+			inset 3px 3px 6px $clay-shadow-dark,
+			inset -3px -3px 6px $clay-shadow-light,
+			0 0 0 3px rgba($clay-accent, 0.35);
+	}
+
+	&--with-icon {
+		padding-right: 2.75rem;
+	}
+
+	&.is-invalid {
+		box-shadow:
+			inset 3px 3px 6px $clay-shadow-dark,
+			inset -3px -3px 6px $clay-shadow-light,
+			0 0 0 3px rgba($color-danger-text, 0.3);
+	}
+}
+
+.form-label-brutal {
+	@include clay-text;
+	display: block;
+	font-size: 0.875rem;
+	font-weight: 700;
+}
+
+.form-error {
+	font-size: 0.75rem;
+	color: $color-danger-text;
+	margin-top: 0.25rem;
+	font-weight: 600;
+}

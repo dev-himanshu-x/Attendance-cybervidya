@@ -1,0 +1,74 @@
+// Bootstrap variable overrides — must be set before `bootstrap/scss/bootstrap` is imported.
+
+// Match the app's previous Tailwind breakpoint scale so existing md:/lg: layout
+// decisions (course-card grid, profile action row) don't silently shift.
+$grid-breakpoints: (
+	xs: 0,
+	sm: 640px,
+	md: 768px,
+	lg: 1024px,
+	xl: 1280px,
+	xxl: 1536px,
+);
+$container-max-widths: (
+	sm: 600px,
+	md: 728px,
+	lg: 984px,
+	xl: 1200px,
+	xxl: 1400px,
+);
+
+$body-bg: #eaf2fb; // soft sky, solid fallback for bootstrap's body background-color
+$body-color: #33415c;
+$border-radius: 1.25rem;
+$border-radius-sm: 0.9rem;
+$border-radius-lg: 1.75rem;
+$link-color: #3b82f6;
+$font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+$enable-shadows: false;
+
+// ---- Claymorphism design tokens (not part of Bootstrap's variable set) ----
+// Soft, puffy surfaces: a dual-tone shadow (dark below-right, light above-left)
+// standing in for the hard borders a flatter design would use.
+$clay-page-gradient: linear-gradient(180deg, #bfe0fb 0%, #dcedfb 35%, #f6fafd 75%, #ffffff 100%);
+$clay-surface: #eef4fb; // base clay color things are "molded" from
+$clay-surface-alt: #ffffff;
+$clay-text: #33415c; // soft navy instead of pure black
+$clay-text-muted: #7c8aa5;
+
+$clay-shadow-light: rgba(255, 255, 255, 0.8);
+$clay-shadow-dark: rgba(163, 177, 198, 0.55);
+
+$clay-radius-sm: 0.9rem;
+$clay-radius-md: 1.25rem;
+$clay-radius-lg: 1.75rem;
+$clay-radius-xl: 2rem;
+$clay-radius-pill: 999px;
+
+$shadow-sm: 4px 4px 8px $clay-shadow-dark, -4px -4px 8px $clay-shadow-light;
+$shadow-md: 8px 8px 16px $clay-shadow-dark, -8px -8px 16px $clay-shadow-light;
+$shadow-lg: 14px 14px 28px $clay-shadow-dark, -10px -10px 22px $clay-shadow-light;
+
+$clay-accent: #3b82f6; // soft blue accent
+$clay-accent-dark: #1f2937; // charcoal used for primary CTAs, like the reference button
+
+$color-present: #86e0b8; // softened emerald
+$color-present-text: #0f9d63;
+$color-absent: #f0847b; // softened coral instead of a hard red
+$color-adjusted: #fbd97a; // softened amber
+$color-warning-text: #b8790f;
+$color-danger-text: #d1554b;
+
+$color-tinted-bg: #e6f0fe;
+$color-tinted-text: #3b82f6;
+$color-tinted-bg-hover: #d6e6fd;
+
+// Status palette (fixed — never themed), validated for CVD-safe separation.
+$status-good: #0ca30c;
+$status-warning: #fab219;
+$status-critical: #d03b3b;
+
+// Distinct from the blue accent used by buttons/links, so highlight chips
+// (e.g. a course code badge) don't visually merge with call-to-action buttons.
+$color-highlight-bg: #f2ecfe;
+$color-highlight-text: #7c4fe0;

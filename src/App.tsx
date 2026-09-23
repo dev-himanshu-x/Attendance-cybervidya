@@ -1,113 +1,80 @@
+import { useQueryClient } from "@tanstack/react-query";
 import Cookies from "js-cookie";
-import { useEffect, useRef, useState } from "react";
-import Attendance from "./components/Attendance";
-import ExtensionUpdateNotice from "./components/ExtensionUpdateNotice";
-import Footer from "./components/Footer";
-import LoginForm from "./components/LoginForm";
-import TnC from "./components/TnC";
-import { AttendanceDataContext } from "./contexts/AppContext";
-import { AUTH_COOKIE_NAME, COOKIE_EXPIRY } from "./types/constants";
-import type { StudentDetails } from "./types/response";
-import { fetchAttendanceData } from "./utils/LoginUtils";
+import { useCallback, useEffect, useRef, useState } from "react";
+import Attendance from "./components/attendance/Attendance";
+import LoginForm from "./components/auth/LoginForm";
+import TnC from "./components/auth/TnC";
+import AppHeader from "./components/layout/AppHeader";
+import ExtensionUpdateNotice from "./components/layout/ExtensionUpdateNotice";
+import Footer from "./components/layout/Footer";
+import { useAuthToken } from "./hooks/useAuthToken";
+import { useToast } from "./hooks/useToast";
+import {
+	attendanceQueryKey,
+	useAttendanceQuery,
+} from "./queries/useAttendanceQuery";
+import { STUDENT_ID_COOKIE_NAME } from "./types/constants";
 
 function App() {
-	const [attendanceData, setAttendanceData] = useState<StudentDetails | null>(
-		null,
-	);
+	const { token, setToken, clearToken } = useAuthToken();
+	const queryClient = useQueryClient();
+	const toast = useToast();
 
 	const [isTnCVisible, setIsTnCVisible] = useState<boolean>(false);
-	const [showGreenBanner, setShowGreenBanner] = useState<boolean>(true);
-	const hasSelectedLiveRef = useRef<boolean>(false);
+	const [searchQuery, setSearchQuery] = useState("");
+	const hasHandledUrlTokenRef = useRef<boolean>(false);
 
-	const handleModeChange = (mode: "proxy" | "live") => {
-		if (mode === "live") {
-			hasSelectedLiveRef.current = true;
-		} else if (mode === "proxy" && hasSelectedLiveRef.current) {
-			setShowGreenBanner(false);
-		}
-	};
+	const attendanceQuery = useAttendanceQuery(token);
 
 	useEffect(() => {
+		if (hasHandledUrlTokenRef.current) return;
 		const searchParams = new URLSearchParams(window.location.search);
 		const urlToken = searchParams.get("token");
 
 		if (urlToken) {
-			// Token mode: fetch attendance data from the ERP API.
+			hasHandledUrlTokenRef.current = true;
 			// The extension's DNR ruleset rewrites request headers so the
 			// ERP accepts calls originating from this app.
 			window.history.replaceState({}, document.title, window.location.pathname);
-
-			const loginWithToken = async () => {
-				try {
-					Cookies.set(AUTH_COOKIE_NAME, urlToken, { expires: COOKIE_EXPIRY });
-					const data = await fetchAttendanceData(urlToken);
-
-					const updatedStudentDetails: StudentDetails = {
-						...data,
-						attendanceCourseComponentInfoList:
-							data.attendanceCourseComponentInfoList.map((course) => ({
-								...course,
-								attendanceCourseComponentNameInfoList:
-									course.attendanceCourseComponentNameInfoList.map(
-										(component) => ({
-											...component,
-											isProjected: false,
-										}),
-									),
-							})),
-					};
-
-					setAttendanceData(updatedStudentDetails);
-				} catch (error) {
-					console.error("Failed to login with URL token", error);
-				}
-			};
-			loginWithToken();
+			setToken(urlToken, 7);
 		}
-	}, []);
+	}, [setToken]);
+
+	useEffect(() => {
+		if (attendanceQuery.isError) {
+			toast.error(
+				attendanceQuery.error instanceof Error
+					? attendanceQuery.error.message
+					: "Failed to load attendance data.",
+			);
+		}
+	}, [attendanceQuery.isError, attendanceQuery.error, toast]);
+
+	const handleLogout = useCallback(() => {
+		queryClient.removeQueries({ queryKey: attendanceQueryKey(token) });
+		clearToken();
+		Cookies.remove(STUDENT_ID_COOKIE_NAME);
+	}, [queryClient, token, clearToken]);
 
 	return (
-		<div className="min-h-screen bg-gray-100 flex flex-col">
-			{showGreenBanner && (
-				<div className="overflow-hidden m-auto bg-green-100 w-full">
-					<div className="py-2 text-center text-sm font-medium text-green-600">
-						YOUR CREDENTIALS ARE NEVER SHARED WITH US. THEY ARE SENT DIRECTLY TO
-						CYBERVIDYA AND STORED LOCALLY.
-						<a
-							href="https://github.com/AmanDevelops/attendance-kiet"
-							className="text-blue-400"
-							target="_blank"
-							rel="noopener"
-						>
-							{" "}
-							VIEW SOURCE CODE
-						</a>
-					</div>
-				</div>
-			)}
+		<div className="app-shell">
+			<AppHeader
+				searchQuery={searchQuery}
+				onSearchChange={setSearchQuery}
+				onLogout={attendanceQuery.data ? handleLogout : undefined}
+			/>
 			<ExtensionUpdateNotice />
-			<div className="grow flex flex-col justify-center">
-				<AttendanceDataContext.Provider
-					value={{
-						attendanceData,
-						setAttendanceData,
-					}}
-				>
-					{!attendanceData ? (
-						isTnCVisible ? (
-							<TnC setIsPasswordVisible={setIsTnCVisible} />
-						) : (
-							<LoginForm
-								setIsTnCVisible={setIsTnCVisible}
-								onModeChange={handleModeChange}
-							/>
-						)
+			<div className="app-main">
+				{!attendanceQuery.data ? (
+					isTnCVisible ? (
+						<TnC setIsTnCVisible={setIsTnCVisible} />
 					) : (
-						<Attendance />
-					)}
-				</AttendanceDataContext.Provider>
+						<LoginForm />
+					)
+				) : (
+					<Attendance searchQuery={searchQuery} />
+				)}
 			</div>
-
 			<Footer />
 		</div>
 	);

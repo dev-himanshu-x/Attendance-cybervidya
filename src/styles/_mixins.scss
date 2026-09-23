@@ -1,0 +1,81 @@
+// Puffs an element up off the page with a soft dual-tone shadow instead of a
+// hard border — the core claymorphism effect.
+@mixin clay-raised($shadow: $shadow-md, $radius: $clay-radius-md, $surface: $clay-surface-alt) {
+	border: none;
+	border-radius: $radius;
+	background: $surface;
+	box-shadow: $shadow;
+}
+
+// The inverse of clay-raised: presses an element into the page, used for
+// inputs and toggle tracks so they read as a groove rather than a bump.
+@mixin clay-inset($radius: $clay-radius-md, $surface: $clay-surface) {
+	border: none;
+	border-radius: $radius;
+	background: $surface;
+	box-shadow:
+		inset 3px 3px 6px $clay-shadow-dark,
+		inset -3px -3px 6px $clay-shadow-light;
+}
+
+@mixin clay-text {
+	font-family: $font-family-sans-serif;
+	letter-spacing: 0.01em;
+	color: $clay-text;
+}
+
+@mixin panel-sheen {
+	position: relative;
+	background: linear-gradient(160deg, #ffffff 0%, $clay-surface 100%);
+
+	&::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, transparent 40%);
+		pointer-events: none;
+	}
+}
+
+@mixin table-scroll {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+
+	&::-webkit-scrollbar {
+		height: 6px;
+		width: 6px;
+	}
+
+	&::-webkit-scrollbar-track {
+		background: #f1f5f9;
+		border-radius: 9999px;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background: #cbd5e1;
+		border-radius: 9999px;
+		transition: background-color 0.2s;
+	}
+
+	&::-webkit-scrollbar-thumb:hover {
+		background: #94a3b8;
+	}
+}
+
+@mixin hide-scrollbar {
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+@mixin hover-lift {
+	transition: transform 0.2s ease;
+
+	&:hover {
+		transform: translateY(-4px);
+	}
+}

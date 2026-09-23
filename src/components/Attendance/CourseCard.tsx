@@ -1,8 +1,11 @@
 import { AlertTriangle, CheckCircle } from "lucide-react";
 import { memo } from "react";
-import { TARGET_PERCENTAGE } from "../../types/constants";
+import { useTargetPercentage } from "../../hooks/useTargetPercentage";
+import { calculateAttendanceProjection } from "../../lib/attendanceProjection";
 import type { CourseAttendanceInfo } from "../../types/response";
-import type { SelectedComponentType } from "../Attendance";
+import Badge from "../ui/Badge";
+import Card from "../ui/Card";
+import type { SelectedComponentType } from "./Attendance";
 
 interface CourseCardProps {
 	onViewDaywiseAttendance: (
@@ -12,127 +15,93 @@ interface CourseCardProps {
 	course: CourseAttendanceInfo;
 }
 
-function calculateAttendanceProjection(present: number, total: number) {
-	if (total === 0) {
-		return { status: "safe", message: "No classes held yet." };
-	}
-	const currentPercentage = (present / total) * 100;
-
-	if (currentPercentage >= TARGET_PERCENTAGE) {
-		const canMiss = Math.floor(
-			(present - (TARGET_PERCENTAGE / 100) * total) / (TARGET_PERCENTAGE / 100),
-		);
-		return {
-			status: "safe",
-			message:
-				canMiss > 0
-					? `You can miss ${canMiss} class${canMiss === 1 ? "" : "es"} only`
-					: "Try not to miss any more classes",
-		};
-	} else {
-		const needToAttend = Math.ceil(
-			((TARGET_PERCENTAGE / 100) * total - present) /
-				(1 - TARGET_PERCENTAGE / 100),
-		);
-		return {
-			status: "warning",
-			message: `Need to attend next ${needToAttend} class${
-				needToAttend === 1 ? "" : "es"
-			}`,
-		};
-	}
-}
-
 function CourseCard({ onViewDaywiseAttendance, course }: CourseCardProps) {
+	const { targetPercentage } = useTargetPercentage();
 	const subjectMissed = 0;
 
 	return (
-		<div
-			key={course.courseCode}
-			className="bg-white rounded-lg shadow-md p-6 style-border style-fade-in"
-		>
-			<h3 className="text-sm font-bold text-gray-800 mb-2 style-text">
-				{course.courseName}
-			</h3>
-			<p className="text-sm text-gray-600 mb-4 style-text">
-				Code: {course.courseCode}
-			</p>
-			<div className="space-y-4">
-				{course.attendanceCourseComponentNameInfoList.map(
-					(component, _index) => {
-						const projectedPresent =
-							component.numberOfPresent + component.numberOfExtraAttendance;
-						const projectedTotal = component.numberOfPeriods + subjectMissed;
-						const projectedSubjectPercent =
-							projectedTotal > 0
-								? (projectedPresent / projectedTotal) * 100
-								: 0;
-
-						const currentSubjectProjection = calculateAttendanceProjection(
-							component.numberOfPresent + component.numberOfExtraAttendance,
-							component.numberOfPeriods + subjectMissed,
-						);
-
-						return (
-							<div
-								key={component.componentName}
-								className="border-t-2 pt-4 border-black"
-							>
-								<div className="flex justify-between items-center mb-2">
-									<span className="text-sm font-medium text-gray-700 style-text">
-										{component.componentName}
-									</span>
-									<span
-										className={`text-sm font-semibold ${
-											projectedSubjectPercent >= TARGET_PERCENTAGE
-												? "text-emerald-600"
-												: "text-red-600"
-										}`}
-									>
-										{`${projectedSubjectPercent.toFixed(1)}% ${component.isProjected ? "(Projected)" : ""}`}
-									</span>
-								</div>
-								<div className="text-sm text-gray-600 mb-2">
-									Present:{" "}
-									{component.numberOfPresent +
-										component.numberOfExtraAttendance}
-									/{component.numberOfPeriods + subjectMissed}
-								</div>
-								{currentSubjectProjection && (
-									<>
-										<div
-											className={`flex items-center gap-2 text-sm ${
-												currentSubjectProjection.status === "safe"
-													? "text-emerald-600"
-													: "text-amber-600"
-											}`}
-										>
-											{currentSubjectProjection.status === "safe" ? (
-												<CheckCircle className="h-4 w-4" />
-											) : (
-												<AlertTriangle className="h-4 w-4" />
-											)}
-											{currentSubjectProjection.message}
-										</div>
-										<div className="pt-2 ">
-											<button
-												type="button"
-												onClick={() =>
-													onViewDaywiseAttendance(course, component)
-												}
-												className="style-border style-text py-2 px-3 text-xs font-bold flex items-center gap-1 cursor-pointer hover:text-white hover:bg-black transform transition-transform duration-300 hover:-translate-y-1 focus:outline-none hover:transition-all hover:duration-300"
-											>
-												See Daywise Attendance
-											</button>
-										</div>
-									</>
-								)}
-							</div>
-						);
-					},
-				)}
+		<Card>
+			<div className="d-flex justify-content-between align-items-start gap-2 mb-3">
+				<h3 className="fs-6 fw-bold text-secondary-emphasis mb-0 text-brutal">
+					{course.courseName}
+				</h3>
+				<Badge size="sm" variant="highlight" className="flex-shrink-0">
+					{course.courseCode}
+				</Badge>
 			</div>
-		</div>
+			<div className="d-flex flex-column gap-3">
+				{course.attendanceCourseComponentNameInfoList.map((component) => {
+					const projectedPresent =
+						component.numberOfPresent + component.numberOfExtraAttendance;
+					const projectedTotal = component.numberOfPeriods + subjectMissed;
+					const projectedSubjectPercent =
+						projectedTotal > 0 ? (projectedPresent / projectedTotal) * 100 : 0;
+
+					const currentSubjectProjection = calculateAttendanceProjection(
+						projectedPresent,
+						projectedTotal,
+						targetPercentage,
+					);
+
+					const isOnTarget = currentSubjectProjection.status === "safe";
+
+					return (
+						<div
+							key={component.componentName}
+							className="pt-3 course-card__divider"
+						>
+							<div className="d-flex justify-content-between align-items-center mb-2">
+								<Badge size="sm" variant="neutral">
+									{component.componentName}
+								</Badge>
+								<span
+									className={`small fw-semibold ${
+										isOnTarget ? "text-success" : "text-danger"
+									}`}
+								>
+									{`${projectedSubjectPercent.toFixed(1)}% ${component.isProjected ? "(Projected)" : ""}`}
+								</span>
+							</div>
+							<div className="course-card__bar mb-2">
+								<div
+									className="course-card__bar-fill"
+									style={{
+										width: `${Math.min(100, projectedSubjectPercent)}%`,
+										backgroundColor: isOnTarget
+											? "var(--status-good)"
+											: "var(--status-critical)",
+									}}
+								/>
+							</div>
+							<div className="small text-secondary text-end mb-2">
+								Present: {projectedPresent}/{projectedTotal}
+							</div>
+							<div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+								<div
+									className={`d-flex align-items-center gap-2 small ${
+										isOnTarget ? "text-success" : "text-warning"
+									}`}
+								>
+									{isOnTarget ? (
+										<CheckCircle size={16} />
+									) : (
+										<AlertTriangle size={16} />
+									)}
+									{currentSubjectProjection.message}
+								</div>
+								<button
+									type="button"
+									onClick={() => onViewDaywiseAttendance(course, component)}
+									className="btn-brutal btn-brutal--tinted flex-shrink-0"
+								>
+									See Daywise Attendance
+								</button>
+							</div>
+						</div>
+					);
+				})}
+			</div>
+		</Card>
 	);
 }
 

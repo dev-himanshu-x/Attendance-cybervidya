@@ -83,8 +83,9 @@ export interface ScheduleEntry {
 	courseCode: string;
 	courseCompName: string;
 	facultyName: string;
-	lectureDate: string; // e.g., "10/01/2024"
+	lectureDate: string | null; // e.g., "10/01/2024"
 	type: "CLASS" | "HOLIDAY";
+	classRoom: string;
 }
 
 export interface ScheduleResponse {

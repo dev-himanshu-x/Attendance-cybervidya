@@ -1,0 +1,9 @@
+.skeleton {
+	background: $clay-surface;
+	border-radius: $clay-radius-sm;
+	animation: pulse 1.5s ease-in-out infinite;
+
+	&--light {
+		background: #f3f7fc;
+	}
+}

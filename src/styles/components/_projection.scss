@@ -1,0 +1,88 @@
+.projection-table__wrap {
+	border-radius: $clay-radius-md;
+	overflow: hidden;
+	box-shadow: 0 0 0 1px rgba(163, 177, 198, 0.25);
+	background: $clay-surface-alt;
+}
+
+.projection-table {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0;
+	table-layout: fixed;
+
+	th,
+	td {
+		border-bottom: 1px solid rgba(163, 177, 198, 0.25);
+		border-right: 1px solid rgba(163, 177, 198, 0.25);
+	}
+
+	th:last-child,
+	td:last-child {
+		border-right: none;
+	}
+
+	tr:last-child td {
+		border-bottom: none;
+	}
+
+	thead th {
+		background: $clay-surface;
+		color: $clay-text-muted;
+		font-weight: 600;
+		padding: 0.75rem 0.5rem;
+	}
+
+	&__day {
+		background: $clay-surface;
+		font-weight: 700;
+		color: $clay-text;
+		padding: 0.75rem 0.5rem;
+	}
+
+	&__lunch {
+		background: rgba(163, 177, 198, 0.12);
+		color: $clay-text-muted;
+		font-weight: 700;
+		text-transform: uppercase;
+		font-size: 0.7rem;
+	}
+
+	&__empty {
+		color: $clay-text-muted;
+	}
+}
+
+.class-chip {
+	width: 100%;
+	height: 100%;
+	min-height: 3.5rem;
+	padding: 0.5rem 0.5rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	background: $color-tinted-bg;
+	color: $color-tinted-text;
+	border: none;
+	cursor: pointer;
+	font-weight: 700;
+	font-size: 0.75rem;
+	line-height: 1.2;
+	transition:
+		background-color 0.15s ease,
+		color 0.15s ease;
+
+	&:hover {
+		background: $color-tinted-bg-hover;
+	}
+
+	&--missed {
+		background: #fdecec;
+		color: $color-danger-text;
+
+		&:hover {
+			background: #fbd9d9;
+		}
+	}
+}

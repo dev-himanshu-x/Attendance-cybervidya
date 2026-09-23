@@ -1,0 +1,37 @@
+.table-brutal {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0;
+	background: $clay-surface-alt;
+	border-radius: $clay-radius-md;
+	overflow: hidden;
+
+	th,
+	td {
+		border-bottom: 1px solid rgba(163, 177, 198, 0.25);
+		padding: 0.625rem 0.75rem;
+	}
+
+	thead {
+		background: $clay-surface;
+		font-weight: 600;
+		font-size: 0.875rem;
+		color: $clay-text-muted;
+	}
+
+	tbody tr:hover {
+		background: #f6faff;
+	}
+
+	tbody tr:last-child td {
+		border-bottom: none;
+	}
+}
+
+.table-scroll {
+	@include table-scroll;
+}
+
+.table-scroll--hidden {
+	@include hide-scrollbar;
+}

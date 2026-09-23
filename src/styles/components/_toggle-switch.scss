@@ -1,0 +1,48 @@
+.toggle-switch {
+	position: relative;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	width: 16rem;
+	padding: 4px;
+	user-select: none;
+	@include clay-inset($clay-radius-pill);
+}
+
+.toggle-switch__btn {
+	position: relative;
+	z-index: 1;
+	padding: 0.375rem 0;
+	font-size: 0.75rem;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	text-align: center;
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: $clay-text-muted;
+	transition: color 0.2s ease;
+
+	&:hover {
+		color: $clay-text;
+	}
+
+	&--active {
+		color: #fff;
+	}
+}
+
+.toggle-switch__indicator {
+	position: absolute;
+	top: 4px;
+	bottom: 4px;
+	left: 4px;
+	width: calc(50% - 4px);
+	border-radius: $clay-radius-pill;
+	background: linear-gradient(160deg, #4c94f7 0%, $clay-accent 100%);
+	box-shadow: $shadow-sm;
+	transition: left 0.2s ease-in-out;
+
+	&--right {
+		left: calc(50% + 0px);
+	}
+}

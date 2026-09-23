@@ -1,30 +1,22 @@
-import axios from "axios";
 import { ChevronLeft, ChevronRight, Clock, X } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useAppContext } from "../../contexts/AppContext";
-import { getBaseUrl } from "../../types/constants";
+import { useEffect, useId, useMemo, useState } from "react";
+import { useTargetPercentage } from "../../hooks/useTargetPercentage";
+import { useToast } from "../../hooks/useToast";
 import type {
-	AttendanceApiResponse,
-	LectureListProps,
-} from "../../types/response";
+	CourseDay,
+	DayMap,
+} from "../../queries/useCalendarAttendanceQuery";
+import { useCalendarAttendanceQuery } from "../../queries/useCalendarAttendanceQuery";
+import type { StudentDetails } from "../../types/response";
+import Badge from "../ui/Badge";
+import Modal from "../ui/Modal";
+import Skeleton from "../ui/Skeleton";
 
 interface CalendarViewProps {
 	token: string;
 	studentId: number;
+	attendanceData: StudentDetails | null;
 }
-
-interface CourseDay {
-	courseCode: string;
-	courseName: string;
-	componentName: string;
-	timeSlot: string;
-	attendance: LectureListProps["attendance"];
-}
-
-type DayMap = Record<string, CourseDay[]>;
-
-// Module-level cache — survives component unmount/remount (e.g. switching views)
-let _calendarCache: DayMap | null = null;
 
 const MONTH_NAMES = [
 	"January",
@@ -41,11 +33,9 @@ const MONTH_NAMES = [
 	"December",
 ];
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-function toDateKey(dateStr: string): string {
-	const d = new Date(dateStr);
-	return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
+// Matches the "at risk" threshold used elsewhere (OverallAtt) so the same
+// percentage reads as the same color everywhere in the app.
+const STATUS_STEPS_BELOW_TARGET = 10;
 
 function formatDateLabel(dateKey: string): string {
 	const [y, m, d] = dateKey.split("-");
@@ -55,7 +45,7 @@ function formatDateLabel(dateKey: string): string {
 	return `${dayName}, ${d} ${MONTH_NAMES[Number(m) - 1]} ${y}`;
 }
 
-// Extracts the start time of a slot like "09:00 AM - 10:00 AM" or "09:00-10:00" into minutes-since-midnight
+// Extracts the start time of a slot like "09:00 AM - 10:00 AM" into minutes-since-midnight
 function timeSlotStartMinutes(timeSlot: string): number {
 	const match = timeSlot.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
 	if (!match) return 0;
@@ -67,6 +57,70 @@ function timeSlotStartMinutes(timeSlot: string): number {
 	return hours * 60 + minutes;
 }
 
+// ── Attendance Ring ──────────────────────────────────────────────────────────
+interface AttendanceRingProps {
+	percent: number;
+	color: string;
+	gradientFrom: string;
+	gradientTo: string;
+}
+
+function AttendanceRing({
+	percent,
+	color,
+	gradientFrom,
+	gradientTo,
+}: AttendanceRingProps) {
+	const size = 60;
+	const stroke = 6;
+	const radius = (size - stroke) / 2;
+	const circumference = 2 * Math.PI * radius;
+	const clamped = Math.min(100, Math.max(0, percent));
+	const offset = circumference * (1 - clamped / 100);
+	const gradientId = `calendar-ring-gradient-${useId()}`;
+
+	return (
+		<div className="calendar-view__ring" style={{ color }}>
+			<svg
+				width={size}
+				height={size}
+				viewBox={`0 0 ${size} ${size}`}
+				role="img"
+				aria-label={`${Math.round(percent)}% attendance this month`}
+			>
+				<defs>
+					<linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+						<stop offset="0%" stopColor={gradientFrom} />
+						<stop offset="100%" stopColor={gradientTo} />
+					</linearGradient>
+				</defs>
+				<circle
+					cx={size / 2}
+					cy={size / 2}
+					r={radius}
+					fill="none"
+					stroke="rgba(163, 177, 198, 0.22)"
+					strokeWidth={stroke}
+				/>
+				<circle
+					className="calendar-view__ring-progress"
+					cx={size / 2}
+					cy={size / 2}
+					r={radius}
+					fill="none"
+					stroke={`url(#${gradientId})`}
+					strokeWidth={stroke}
+					strokeLinecap="round"
+					strokeDasharray={circumference}
+					strokeDashoffset={offset}
+					transform={`rotate(-90 ${size / 2} ${size / 2})`}
+				/>
+			</svg>
+			<span className="calendar-view__ring-label">{Math.round(percent)}%</span>
+		</div>
+	);
+}
+
 // ── Day Detail Modal ────────────────────────────────────────────────────────
 interface DayModalProps {
 	dateKey: string;
@@ -75,7 +129,6 @@ interface DayModalProps {
 }
 
 function DayModal({ dateKey, entries, onClose }: DayModalProps) {
-	// Sort chronologically by start time (9 AM first, latest last)
 	const sorted = useMemo(
 		() =>
 			[...entries].sort(
@@ -85,123 +138,96 @@ function DayModal({ dateKey, entries, onClose }: DayModalProps) {
 		[entries],
 	);
 
-	// Close on Escape
-	useEffect(() => {
-		function onKey(e: KeyboardEvent) {
-			if (e.key === "Escape") onClose();
-		}
-		document.addEventListener("keydown", onKey);
-		return () => document.removeEventListener("keydown", onKey);
-	}, [onClose]);
-
 	const presentCount = sorted.filter(
 		(e) => e.attendance === "PRESENT" || e.attendance === "ADJUSTED",
 	).length;
 	const absentCount = sorted.filter((e) => e.attendance === "ABSENT").length;
 
 	return (
-		<div className="fixed inset-0 flex items-center justify-center z-50 px-4">
-			<button
-				type="button"
-				className="absolute inset-0 w-full h-full bg-transparent backdrop-blur-[3px] cursor-default focus:outline-none"
-				onClick={onClose}
-				aria-label="Close modal"
-				tabIndex={-1}
-			/>
-			<div className="relative bg-white p-4 sm:p-6 rounded-none border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-w-3xl w-full max-h-[85vh] flex flex-col style-fade-in">
-				{/* Header */}
-				<div className="flex justify-between items-start gap-2 mb-6 border-b-4 border-black pb-4 shrink-0">
-					<div className="min-w-0">
-						<h2 className="text-lg sm:text-xl font-black style-text uppercase tracking-tighter break-words">
-							{formatDateLabel(dateKey)}
-						</h2>
-						<div className="flex flex-wrap gap-2 sm:gap-4 mt-2">
-							<span className="text-sm font-black style-text text-black bg-emerald-300 border-2 border-black px-2 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-								{presentCount} PRESENT
-							</span>
-							<span className="text-sm font-black style-text text-white bg-[#DA291C] border-2 border-black px-2 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-								{absentCount} ABSENT
-							</span>
+		<Modal onClose={onClose}>
+			<div className="d-flex justify-content-between align-items-start gap-2 mb-4 pb-3 calendar-view__divider-bottom">
+				<div className="text-truncate">
+					<h2 className="fs-5 fw-bold text-brutal mb-0">
+						{formatDateLabel(dateKey)}
+					</h2>
+					<div className="d-flex flex-wrap gap-2 mt-2">
+						<Badge variant="present">{presentCount} Present</Badge>
+						<Badge variant="absent">{absentCount} Absent</Badge>
+					</div>
+				</div>
+				<button
+					type="button"
+					onClick={onClose}
+					className="btn-brutal btn-brutal--plain flex-shrink-0"
+					aria-label="Close"
+				>
+					<X size={24} />
+				</button>
+			</div>
+
+			<div className="modal-panel__body d-flex flex-column gap-3">
+				{sorted.map((entry, i) => (
+					<div
+						// biome-ignore lint/suspicious/noArrayIndexKey: list by position
+						key={i}
+						className="card-panel card-panel--tight"
+					>
+						<div className="d-flex align-items-start justify-content-between gap-2">
+							<div className="text-truncate">
+								<p className="fw-bold text-brutal mb-1">{entry.courseName}</p>
+								<p className="small fw-semibold text-secondary mb-0">
+									{entry.componentName} • {entry.courseCode}
+								</p>
+							</div>
+							<Badge
+								size="sm"
+								variant={
+									entry.attendance === "PRESENT"
+										? "present"
+										: entry.attendance === "ADJUSTED"
+											? "adjusted"
+											: "absent"
+								}
+							>
+								{entry.attendance}
+							</Badge>
+						</div>
+						<div className="d-flex align-items-center gap-1 mt-2 fw-semibold text-secondary pt-2 calendar-view__divider-top">
+							<Clock size={16} />
+							<span className="small">{entry.timeSlot}</span>
 						</div>
 					</div>
-					<button
-						type="button"
-						onClick={onClose}
-						className="text-black hover:bg-yellow-300 border-2 border-transparent hover:border-black p-1 transition-all ml-4 shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
-					>
-						<X className="h-6 w-6 font-black" />
-					</button>
-				</div>
-
-				{/* Timetable list */}
-				<div className="space-y-4 flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-					{sorted.map((entry, i) => {
-						return (
-							<div
-								// biome-ignore lint/suspicious/noArrayIndexKey: list by position
-								key={i}
-								className="flex items-stretch bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-							>
-								{/* Content */}
-								<div className="flex-1 p-3">
-									<div className="flex items-start justify-between gap-2">
-										<div className="min-w-0">
-											<p className="text-base font-black style-text text-black leading-tight break-words uppercase">
-												{entry.courseName}
-											</p>
-											<p className="text-xs text-black font-bold style-text mt-1 uppercase tracking-wider">
-												{entry.componentName} • {entry.courseCode}
-											</p>
-										</div>
-										<span
-											className={`shrink-0 text-[10px] font-black style-text px-2 py-1 border-2 border-black uppercase tracking-widest ${
-												entry.attendance === "PRESENT"
-													? "bg-emerald-300 text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-													: entry.attendance === "ADJUSTED"
-														? "bg-amber-300 text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-														: "bg-[#DA291C] text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-											}`}
-										>
-											{entry.attendance}
-										</span>
-									</div>
-									<div className="flex items-center gap-1 mt-3 text-black font-bold border-t-2 border-black pt-2">
-										<Clock className="h-4 w-4 shrink-0" />
-										<span className="text-xs style-text tracking-widest">
-											{entry.timeSlot}
-										</span>
-									</div>
-								</div>
-							</div>
-						);
-					})}
-				</div>
+				))}
 			</div>
-		</div>
+		</Modal>
 	);
 }
 
 // ── Loading Skeleton ────────────────────────────────────────────────────────
 function SkeletonCalendar() {
 	return (
-		<div className="animate-pulse">
-			<div className="flex items-center justify-between mb-4">
-				<div className="h-8 w-8 bg-gray-200 rounded" />
-				<div className="h-6 w-44 bg-gray-200 rounded" />
-				<div className="h-8 w-8 bg-gray-200 rounded" />
-			</div>
-			<div className="grid grid-cols-7 border-l border-t border-gray-200">
+		<div className="calendar-view__body px-2 px-sm-3 pb-2 pb-sm-3">
+			<div
+				className="d-grid mb-1 mb-sm-2"
+				style={{ gridTemplateColumns: "repeat(7, 1fr)" }}
+			>
 				{DAY_NAMES.map((d) => (
-					<div
+					<Skeleton
 						key={d}
-						className="h-8 bg-gray-100 border-r border-b border-gray-200"
+						className="skeleton--light mx-auto"
+						style={{ height: "0.9rem", width: "1.75rem" }}
 					/>
 				))}
+			</div>
+			<div
+				className="calendar-view__grid"
+				style={{ gridTemplateColumns: "repeat(7, 1fr)" }}
+			>
 				{Array.from({ length: 35 }).map((_, i) => (
-					// biome-ignore lint/suspicious/noArrayIndexKey: skeleton
 					<div
+						// biome-ignore lint/suspicious/noArrayIndexKey: skeleton
 						key={i}
-						className="h-20 bg-white border-r border-b border-gray-200"
+						className="calendar-view__cell"
 					/>
 				))}
 			</div>
@@ -209,103 +235,33 @@ function SkeletonCalendar() {
 	);
 }
 
-// ── Progress bar while fetching ─────────────────────────────────────────────
-
 // ── Main CalendarView ───────────────────────────────────────────────────────
-export default function CalendarView({ token, studentId }: CalendarViewProps) {
-	const { attendanceData } = useAppContext();
-
-	// Persist fetched data across re-mounts (won't re-fetch on view toggle)
-	const [dayMap, setDayMap] = useState<DayMap>(() => _calendarCache ?? {});
-	const [loading, setLoading] = useState(_calendarCache === null);
-	const [error, setError] = useState("");
+export default function CalendarView({
+	token,
+	studentId,
+	attendanceData,
+}: CalendarViewProps) {
+	const toast = useToast();
+	const calendarQuery = useCalendarAttendanceQuery(
+		token,
+		studentId,
+		attendanceData,
+	);
+	const dayMap: DayMap = calendarQuery.data ?? {};
 
 	const today = new Date();
 	const [viewYear, setViewYear] = useState(today.getFullYear());
 	const [viewMonth, setViewMonth] = useState(today.getMonth());
-
 	const [selectedDate, setSelectedDate] = useState<string | null>(null);
-
-	// ── Fetch all courses (only once per session) ───────────────────────────
-	const fetchAll = useCallback(async () => {
-		if (!attendanceData || !token || !studentId) return;
-		if (_calendarCache !== null) {
-			setDayMap(_calendarCache);
-			setLoading(false);
-			return;
-		}
-
-		const requests = attendanceData.attendanceCourseComponentInfoList.flatMap(
-			(course) =>
-				course.attendanceCourseComponentNameInfoList.map((component) => ({
-					courseCode: course.courseCode,
-					courseName: course.courseName,
-					componentName: component.componentName,
-					payload: {
-						courseCompId: component.courseComponentId,
-						courseId: course.courseId,
-						sessionId: null,
-						studentId,
-					},
-				})),
-		);
-
-		setLoading(true);
-		setError("");
-
-		const newDayMap: DayMap = {};
-
-		// fetch one at a time to avoid hammering the server
-		for (const req of requests) {
-			try {
-				const res = await axios.post<AttendanceApiResponse>(
-					`${getBaseUrl()}/api/attendance/schedule/student/course/attendance/percentage`,
-					req.payload,
-					{
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: `GlobalEducation ${token}`,
-						},
-					},
-				);
-
-				const data = res.data;
-				if (data.data && data.data.length > 0) {
-					for (const lecture of data.data[0].lectureList) {
-						const key = toDateKey(lecture.planLecDate);
-						if (!newDayMap[key]) newDayMap[key] = [];
-						newDayMap[key].push({
-							courseCode: req.courseCode,
-							courseName: req.courseName,
-							componentName: req.componentName,
-							timeSlot: lecture.timeSlot,
-							attendance: lecture.attendance,
-						});
-					}
-				}
-			} catch {
-				// skip failed courses silently
-			}
-		}
-
-		_calendarCache = newDayMap;
-		setDayMap(newDayMap);
-		setLoading(false);
-	}, [attendanceData, token, studentId]);
+	const [direction, setDirection] = useState<"prev" | "next">("next");
+	const { targetPercentage } = useTargetPercentage();
 
 	useEffect(() => {
-		fetchAll();
-	}, [fetchAll]);
+		if (calendarQuery.isError) {
+			toast.error("Some courses' attendance could not be loaded.");
+		}
+	}, [calendarQuery.isError, toast]);
 
-	// ── Block body scroll when modal is open ────────────────────────────────
-	useEffect(() => {
-		document.body.style.overflow = selectedDate ? "hidden" : "auto";
-		return () => {
-			document.body.style.overflow = "auto";
-		};
-	}, [selectedDate]);
-
-	// ── Calendar grid ───────────────────────────────────────────────────────
 	const { cells } = useMemo(() => {
 		const firstDay = new Date(viewYear, viewMonth, 1).getDay();
 		const dim = new Date(viewYear, viewMonth + 1, 0).getDate();
@@ -316,7 +272,6 @@ export default function CalendarView({ token, studentId }: CalendarViewProps) {
 		return { cells: arr };
 	}, [viewYear, viewMonth]);
 
-	// ── Month stats ─────────────────────────────────────────────────────────
 	const monthStats = useMemo(() => {
 		let present = 0;
 		let absent = 0;
@@ -335,101 +290,133 @@ export default function CalendarView({ token, studentId }: CalendarViewProps) {
 	}, [dayMap, viewYear, viewMonth]);
 
 	const prevMonth = () => {
+		setDirection("prev");
 		if (viewMonth === 0) {
 			setViewMonth(11);
 			setViewYear((y) => y - 1);
 		} else setViewMonth((m) => m - 1);
 	};
 	const nextMonth = () => {
+		setDirection("next");
 		if (viewMonth === 11) {
 			setViewMonth(0);
 			setViewYear((y) => y + 1);
 		} else setViewMonth((m) => m + 1);
 	};
 
-	// ── Render ──────────────────────────────────────────────────────────────
+	const loading = calendarQuery.isLoading;
+	const isCurrentMonth =
+		viewYear === today.getFullYear() && viewMonth === today.getMonth();
+	const goToToday = () => {
+		const todayIndex = today.getFullYear() * 12 + today.getMonth();
+		const viewIndex = viewYear * 12 + viewMonth;
+		setDirection(todayIndex < viewIndex ? "prev" : "next");
+		setViewYear(today.getFullYear());
+		setViewMonth(today.getMonth());
+	};
+
+	const attendancePercent =
+		monthStats.total > 0
+			? ((monthStats.present + monthStats.adjusted) / monthStats.total) * 100
+			: 0;
+	const attendanceStatus =
+		attendancePercent >= targetPercentage
+			? "good"
+			: attendancePercent >= targetPercentage - STATUS_STEPS_BELOW_TARGET
+				? "warning"
+				: "critical";
+	const attendanceColor = `var(--status-${attendanceStatus})`;
+	const attendanceGradient = {
+		good: { from: "#4ade80", to: "#0ca30c" },
+		warning: { from: "#fbbf24", to: "#fab219" },
+		critical: { from: "#f87171", to: "#d03b3b" },
+	}[attendanceStatus];
+
 	return (
 		<>
-			<div className="bg-white rounded-lg style-border style-fade-in mb-8 overflow-hidden">
-				{/* ── Calendar Header ── */}
-				<div className="flex items-center justify-between px-4 py-4 border-b-2 border-black bg-white">
+			<div className="card-panel calendar-view__card fade-in mb-4 p-0 overflow-hidden">
+				<div className="calendar-view__glow" aria-hidden="true" />
+				<div className="d-flex align-items-center justify-content-between px-3 py-3 calendar-view__divider-bottom position-relative">
 					<button
 						type="button"
 						onClick={prevMonth}
-						className="p-2 rounded-none border-2 border-black transition-all"
+						className="btn-brutal btn-brutal--outline calendar-view__nav-btn"
 						aria-label="Previous month"
 					>
-						<ChevronLeft className="h-5 w-5" />
+						<ChevronLeft size={20} />
 					</button>
 
-					<div className="text-center">
-						<h2 className="text-xl sm:text-2xl font-bold style-text tracking-tighter uppercase">
+					<div className="d-flex flex-column align-items-center">
+						<h2 className="fs-4 fw-bold mb-0 text-center calendar-view__title">
 							{MONTH_NAMES[viewMonth]} {viewYear}
 						</h2>
+						{!isCurrentMonth && (
+							<button
+								type="button"
+								onClick={goToToday}
+								className="calendar-view__today-link"
+							>
+								Jump to today
+							</button>
+						)}
 					</div>
 
 					<button
 						type="button"
 						onClick={nextMonth}
-						className="p-2 rounded-none border-2 border-black transition-all"
+						className="btn-brutal btn-brutal--outline calendar-view__nav-btn"
 						aria-label="Next month"
 					>
-						<ChevronRight className="h-5 w-5" />
+						<ChevronRight size={20} />
 					</button>
 				</div>
 
-				{!loading && !error && monthStats.total > 0 && (
-					<div className="flex flex-wrap gap-4 px-4 py-3 border-b-2 border-black bg-gray-50 text-sm font-bold style-text uppercase items-center justify-between">
-						<div className="flex gap-4">
-							<span className="text-black bg-emerald-300 px-2 py-1 border-2 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-								✓ {monthStats.present + monthStats.adjusted} Present
-							</span>
-							<span className="text-white bg-[#DA291C] px-2 py-1 border-2 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-								✗ {monthStats.absent} Absent
-							</span>
+				{!loading && monthStats.total > 0 && (
+					<div className="d-flex flex-wrap gap-3 px-3 py-3 calendar-view__divider-bottom align-items-center justify-content-between calendar-view__summary">
+						<div className="d-flex gap-2">
+							<Badge variant="present">
+								{monthStats.present + monthStats.adjusted} Present
+							</Badge>
+							<Badge variant="absent">{monthStats.absent} Absent</Badge>
 						</div>
-						<span className="text-black text-base tracking-tighter bg-yellow-300 px-2 py-1 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-							{Math.round(
-								((monthStats.present + monthStats.adjusted) /
-									monthStats.total) *
-									100,
-							)}
-							% ATTENDANCE
-						</span>
+						<div className="calendar-view__attendance-summary">
+							<span className="calendar-view__attendance-caption text-secondary">
+								This month
+							</span>
+							<AttendanceRing
+								percent={attendancePercent}
+								color={attendanceColor}
+								gradientFrom={attendanceGradient.from}
+								gradientTo={attendanceGradient.to}
+							/>
+						</div>
 					</div>
 				)}
 
-				<div className="p-0">
-					{/* ── Progress / Error / Skeleton ── */}
-					{loading && (
-						<div className="p-4">
-							<SkeletonCalendar />
-						</div>
-					)}
+				<div>
+					{loading && <SkeletonCalendar />}
 
-					{error && !loading && (
-						<p className="text-[#DA291C] text-sm font-bold text-center py-8 uppercase tracking-widest">
-							{error}
-						</p>
-					)}
-
-					{/* ── Calendar grid ── */}
-					{!loading && !error && (
-						<div className="border-b-2 border-black">
-							{/* Day-name header row */}
-							<div className="grid grid-cols-7 border-b-2 border-black bg-white text-black">
-								{DAY_NAMES.map((d, i) => (
+					{!loading && (
+						<div className="calendar-view__body px-2 px-sm-3 pb-2 pb-sm-3">
+							<div
+								className="d-grid mb-1 mb-sm-2"
+								style={{ gridTemplateColumns: "repeat(7, 1fr)" }}
+							>
+								{DAY_NAMES.map((d) => (
 									<div
 										key={d}
-										className={`text-center text-xs sm:text-sm font-bold style-text py-3 uppercase tracking-widest ${i !== 6 ? "border-r-2 border-black/20" : ""}`}
+										className="text-center small fw-semibold text-secondary py-1 text-uppercase"
 									>
 										{d}
 									</div>
 								))}
 							</div>
 
-							{/* Date cells */}
-							<div className="grid grid-cols-7 bg-black gap-[2px]">
+							<div
+								key={`${viewYear}-${viewMonth}`}
+								className={`calendar-view__grid calendar-view__grid--${direction}`}
+								style={{ gridTemplateColumns: "repeat(7, 1fr)" }}
+							>
 								{cells.map((day, idx) => {
 									const dateKey =
 										day !== null
@@ -451,16 +438,13 @@ export default function CalendarView({ token, studentId }: CalendarViewProps) {
 									).length;
 
 									return (
-										// biome-ignore lint/a11y/noStaticElementInteractions: interactivity is conditional on hasClasses, role is set accordingly
+										// biome-ignore lint/a11y/noStaticElementInteractions: interactivity is conditional on hasClasses
 										<div
 											// biome-ignore lint/suspicious/noArrayIndexKey: calendar grid by index
 											key={idx}
 											role={hasClasses ? "button" : undefined}
 											tabIndex={hasClasses ? 0 : undefined}
-											className={`relative min-h-[5rem] sm:min-h-[8rem] p-1.5 sm:p-2 transition-all duration-200
-												${day === null ? "bg-gray-100" : "bg-white"}
-												${hasClasses ? "cursor-pointer hover:bg-yellow-100 hover:scale-[1.02] hover:z-10 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:border-2 hover:border-black" : ""}
-											`}
+											className={`calendar-view__cell position-relative p-1 p-sm-2 ${day === null ? "calendar-view__cell--empty" : ""} ${hasClasses ? "cursor-pointer" : ""} ${isToday ? "calendar-view__cell--today" : ""}`}
 											onClick={() =>
 												hasClasses && day !== null && setSelectedDate(dateKey)
 											}
@@ -472,54 +456,29 @@ export default function CalendarView({ token, studentId }: CalendarViewProps) {
 											}
 										>
 											{day !== null && (
-												<div className="h-full flex flex-col">
-													{/* Date number */}
-													<div className="flex justify-between items-start">
-														<span
-															className={`inline-flex items-center justify-center text-lg sm:text-xl font-bold style-text tracking-tighter leading-none
-																${
-																	isToday
-																		? "w-9 h-9 border-2 border-black bg-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] rotate-[-5deg]"
-																		: "text-black"
-																}
-															`}
-														>
-															{day}
-														</span>
-													</div>
+												<div className="h-100 d-flex flex-column align-items-start">
+													<span
+														className={`calendar-view__day-num fw-bold ${
+															isToday ? "calendar-view__today" : "text-brutal"
+														}`}
+													>
+														{day}
+													</span>
 
-													{/* Attendance dots */}
 													{hasClasses && (
-														<div className="mt-auto pt-2 flex flex-col gap-1.5">
+														<div className="mt-auto pt-2 d-flex flex-wrap gap-1">
 															{presentCount > 0 && (
-																<span className="flex items-center justify-center sm:justify-start gap-1 text-[10px] sm:text-sm font-bold style-text text-black bg-emerald-300 border-2 border-black rounded-none px-1 sm:px-2 py-0.5 sm:py-1 leading-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] uppercase">
-																	<span className="sm:hidden">
-																		{presentCount}P
-																	</span>
-																	<span className="hidden sm:inline">
-																		{presentCount} PRESENT
-																	</span>
+																<span className="calendar-view__chip calendar-view__chip--present">
+																	<span className="calendar-view__chip-dot" />
+																	{presentCount}
 																</span>
 															)}
 															{absentCount > 0 && (
-																<span className="flex items-center justify-center sm:justify-start gap-1 text-[10px] sm:text-sm font-bold style-text text-white bg-[#DA291C] border-2 border-black rounded-none px-1 sm:px-2 py-0.5 sm:py-1 leading-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] uppercase">
-																	<span className="sm:hidden">
-																		{absentCount}A
-																	</span>
-																	<span className="hidden sm:inline">
-																		{absentCount} ABSENT
-																	</span>
+																<span className="calendar-view__chip calendar-view__chip--absent">
+																	<span className="calendar-view__chip-dot" />
+																	{absentCount}
 																</span>
 															)}
-														</div>
-													)}
-
-													{/* "tap to view" hint for days with classes */}
-													{hasClasses && (
-														<div className="absolute top-2 right-2 opacity-0 hover:opacity-100 transition-opacity">
-															<span className="bg-black text-white text-[10px] font-bold style-text px-2 py-1 uppercase tracking-widest border-2 border-black">
-																View
-															</span>
 														</div>
 													)}
 												</div>
@@ -533,7 +492,6 @@ export default function CalendarView({ token, studentId }: CalendarViewProps) {
 				</div>
 			</div>
 
-			{/* ── Day Detail Modal ── */}
 			{selectedDate && (
 				<DayModal
 					dateKey={selectedDate}

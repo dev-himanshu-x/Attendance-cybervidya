@@ -1,0 +1,28 @@
+.auth-icon-badge {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 5.5rem;
+	height: 5.5rem;
+	margin: 0 auto;
+	color: $clay-accent-dark;
+	@include clay-raised($shadow-md, $clay-radius-lg, $clay-surface);
+}
+
+.form-control-brutal--with-icon-start {
+	padding-left: 2.75rem;
+}
+
+.form-field {
+	position: relative;
+}
+
+.form-field__icon {
+	position: absolute;
+	top: 50%;
+	left: 1rem;
+	transform: translateY(-50%);
+	color: $clay-text-muted;
+	pointer-events: none;
+	display: flex;
+}

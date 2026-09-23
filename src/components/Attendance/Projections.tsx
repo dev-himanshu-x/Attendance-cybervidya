@@ -1,92 +1,72 @@
-import axios from "axios";
-import Cookies from "js-cookie";
-import { CalendarDays } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useAppContext } from "../../contexts/AppContext";
-import { AUTH_COOKIE_NAME, getBaseUrl } from "../../types/constants";
-import type { ScheduleEntry, ScheduleResponse } from "../../types/response";
-import { getWeekRange } from "../../types/utils";
+import { useQueryClient } from "@tanstack/react-query";
+import { CalendarDays, X } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
+import { formatShortTime } from "../../lib/schedule";
+import { attendanceQueryKey } from "../../queries/useAttendanceQuery";
+import type { ScheduleEntry, StudentDetails } from "../../types/response";
+import Card from "../ui/Card";
 
 type ClassEntry = ScheduleEntry & {
 	formattedStart: string;
 	formattedEnd: string;
 };
 
-function formatShortTime(timeString: string) {
-	if (!timeString) return "";
-	const timePart = timeString.split(" ")[1] || "";
-	const [h, m] = timePart.split(":");
-	if (!h || !m) return "";
-	const hour = Number.parseInt(h, 10);
-	const ampm = hour >= 12 ? "PM" : "AM";
-	const formattedHour = hour % 12 || 12;
-	return `${formattedHour}:${m} ${ampm}`;
+interface ProjectionsProps {
+	token: string | null;
+	schedule: ScheduleEntry[];
+	onClose: () => void;
 }
 
-export default function Projections() {
-	const [schedule, setSchedule] = useState<ScheduleEntry[]>([]);
+export default function Projections({
+	token,
+	schedule,
+	onClose,
+}: ProjectionsProps) {
+	const queryClient = useQueryClient();
 	const [missedClasses, setMissedClasses] = useState<Set<string>>(new Set());
-	const { setAttendanceData } = useAppContext();
 
 	const updateProjectedAttendance = useCallback(
 		(courseCode: string, action: "add" | "subtract") => {
 			const adjustment = action === "add" ? 1 : -1;
 
-			setAttendanceData((prevData) => {
-				if (!prevData) return prevData;
+			queryClient.setQueryData<StudentDetails>(
+				attendanceQueryKey(token),
+				(prevData) => {
+					if (!prevData) return prevData;
 
-				const courseList = prevData.attendanceCourseComponentInfoList;
-				if (!courseList) return prevData;
+					const courseList = prevData.attendanceCourseComponentInfoList;
+					if (!courseList) return prevData;
 
-				const newCourseList = courseList.map((course) => {
-					if (course.courseCode === courseCode) {
-						const updatedNameInfoList = [
-							...course.attendanceCourseComponentNameInfoList,
-						];
+					const newCourseList = courseList.map((course) => {
+						if (course.courseCode === courseCode) {
+							const updatedNameInfoList = [
+								...course.attendanceCourseComponentNameInfoList,
+							];
 
-						updatedNameInfoList[0] = {
-							...updatedNameInfoList[0],
-							numberOfPeriods:
-								updatedNameInfoList[0].numberOfPeriods + adjustment,
-							isProjected: action === "add",
-						};
+							updatedNameInfoList[0] = {
+								...updatedNameInfoList[0],
+								numberOfPeriods:
+									updatedNameInfoList[0].numberOfPeriods + adjustment,
+								isProjected: action === "add",
+							};
 
-						return {
-							...course,
-							attendanceCourseComponentNameInfoList: updatedNameInfoList,
-						};
-					}
-					return course;
-				});
+							return {
+								...course,
+								attendanceCourseComponentNameInfoList: updatedNameInfoList,
+							};
+						}
+						return course;
+					});
 
-				return {
-					...prevData,
-					attendanceCourseComponentInfoList: newCourseList,
-				};
-			});
+					return {
+						...prevData,
+						attendanceCourseComponentInfoList: newCourseList,
+					};
+				},
+			);
 		},
-		[setAttendanceData],
+		[queryClient, token],
 	);
-
-	useEffect(() => {
-		const fetchSchedule = async () => {
-			const token = Cookies.get(AUTH_COOKIE_NAME);
-			if (token) {
-				try {
-					const { startDate, endDate } = getWeekRange();
-					const scheduleResponse = await axios.get<ScheduleResponse>(
-						`${getBaseUrl()}/api/student/schedule/class?weekEndDate=${endDate}&weekStartDate=${startDate}`,
-						{ headers: { Authorization: `GlobalEducation ${token}` } },
-					);
-					setSchedule(scheduleResponse.data.data);
-				} catch (err) {
-					console.error("Failed to fetch schedule", err);
-				}
-			}
-		};
-
-		fetchSchedule();
-	}, []);
 
 	const timeSlots = useMemo(() => {
 		const slotsMap = new Map<
@@ -149,18 +129,23 @@ export default function Projections() {
 
 		schedule
 			.filter((c) => {
-				if (c.type !== "CLASS") return false;
+				if (c.type !== "CLASS" || !c.lectureDate) return false;
 				const [day, month, year] = c.lectureDate.split("/").map(Number);
 				const classDate = new Date(year, month - 1, day);
 				return classDate >= today;
 			})
 			.map((c) => ({
 				...c,
-				timestamp: parseDate(c.lectureDate, c.start.split(" ")[1]).getTime(),
+				timestamp: parseDate(
+					c.lectureDate as string,
+					c.start.split(" ")[1],
+				).getTime(),
 			}))
 			.sort((a, b) => a.timestamp - b.timestamp)
 			.forEach((c) => {
-				const [day, month, year] = c.lectureDate.split("/").map(Number);
+				const [day, month, year] = (c.lectureDate as string)
+					.split("/")
+					.map(Number);
 				const classDate = new Date(year, month - 1, day);
 
 				const dayKey = classDate.toLocaleDateString("en-US", {
@@ -210,7 +195,7 @@ export default function Projections() {
 					return (
 						<td
 							key={slot.label}
-							className="p-1.5 py-3 border-b border-r border-gray-100 text-center text-gray-300 text-xs align-middle"
+							className="projection-table__empty text-center small align-middle"
 						>
 							-
 						</td>
@@ -220,24 +205,15 @@ export default function Projections() {
 				const isMissed = missedClasses.has(classItem.start);
 
 				return (
-					<td
-						key={classItem.start}
-						className={`p-0 border-b border-r border-gray-100 align-middle transition-colors ${
-							isMissed
-								? "bg-red-100 text-red-800 font-semibold"
-								: "bg-transparent hover:bg-gray-100 text-gray-800"
-						}`}
-					>
+					<td key={classItem.start} className="p-0 align-middle">
 						<button
 							type="button"
 							onClick={() =>
 								handleClassToggle(classItem.start, classItem.courseCode)
 							}
-							className="w-full h-full min-h-[56px] py-3 px-1.5 text-center flex flex-col items-center justify-center cursor-pointer bg-transparent text-inherit"
+							className={`class-chip ${isMissed ? "class-chip--missed" : ""}`}
 						>
-							<span className="block text-xs font-bold leading-tight line-clamp-2 text-center">
-								{classItem.courseName}
-							</span>
+							{classItem.courseName}
 						</button>
 					</td>
 				);
@@ -249,54 +225,59 @@ export default function Projections() {
 	const dayEntries = Array.from(groupedSchedule.entries());
 
 	return (
-		<div className="bg-white rounded-lg shadow-md p-6 mb-4 style-border style-fade-in">
-			<div className="flex items-center gap-2 mb-1">
-				<CalendarDays className="h-6 w-6 text-blue-600" />
-				<h3 className="style-text text-md font-semibold text-black">
-					Weekly Projection (Today Onwards)
-				</h3>
+		<Card className="mb-4">
+			<div className="d-flex align-items-center justify-content-between gap-2 mb-1">
+				<div className="d-flex align-items-center gap-2">
+					<CalendarDays size={24} className="text-primary" />
+					<h3 className="text-brutal fs-6 fw-semibold mb-0">
+						Weekly Projection (Today Onwards)
+					</h3>
+				</div>
+				<button
+					type="button"
+					className="btn-brutal btn-brutal--plain"
+					onClick={onClose}
+					aria-label="Close weekly projection"
+				>
+					<X size={18} />
+				</button>
 			</div>
-			<div className="flex items-center justify-between gap-2 mb-4">
-				<p className="style-text text-xs text-gray-600">
+			<div className="d-flex align-items-center justify-content-between gap-2 mb-3">
+				<p className="text-brutal small text-secondary mb-0">
 					Click on any class block to mark it as planned to miss:
 				</p>
-				<span className="md:hidden text-[10px] font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full whitespace-nowrap select-none">
-					Scroll &rarr;
+				<span className="d-md-none small text-secondary bg-light px-2 py-1 rounded-pill">
+					Scroll →
 				</span>
 			</div>
 
 			{dayEntries.length === 0 ? (
-				<p className="style-text text-gray-500">
+				<p className="text-brutal text-secondary">
 					No upcoming classes found for the rest of the week.
 				</p>
 			) : (
-				<div className="w-full border border-gray-200 rounded-lg overflow-x-auto custom-table-scroll bg-white">
-					<table className="w-full min-w-[960px] md:min-w-full table-fixed border-collapse bg-white text-xs">
+				<div className="projection-table__wrap table-scroll">
+					<table
+						className="projection-table mb-0 small"
+						style={{ minWidth: "960px" }}
+					>
 						<thead>
-							<tr className="bg-gray-50 text-gray-700 font-semibold border-b border-gray-200">
-								<th className="p-2 text-center w-16 border-r border-gray-200 text-[10px]">
+							<tr>
+								<th className="text-center" style={{ width: "5.5rem" }}>
 									Day / Date
 								</th>
 								{morningSlots.map((slot) => (
-									<th
-										key={slot.label}
-										className="p-2 text-center font-medium whitespace-nowrap text-[10px] border-r border-gray-200"
-									>
+									<th key={slot.label} className="text-center fw-medium">
 										{slot.label}
 									</th>
 								))}
 
 								{hasLunchBreak && (
-									<th className="p-2 text-center font-bold text-[10px] text-gray-500 tracking-wider uppercase bg-gray-100/80 border-r border-gray-200">
-										LUNCH
-									</th>
+									<th className="projection-table__lunch text-center">LUNCH</th>
 								)}
 
 								{afternoonSlots.map((slot) => (
-									<th
-										key={slot.label}
-										className="p-2 text-center font-medium whitespace-nowrap text-[10px] border-r border-gray-200 last:border-r-0"
-									>
+									<th key={slot.label} className="text-center fw-medium">
 										{slot.label}
 									</th>
 								))}
@@ -308,23 +289,16 @@ export default function Projections() {
 								const dateStr = restDate.join(", ");
 
 								return (
-									<tr
-										key={dayKey}
-										className="hover:bg-gray-50/30 transition-colors"
-									>
-										<td className="p-2 py-3 border-b border-r border-gray-200 bg-gray-100/80 text-center align-middle">
-											<div className="font-bold text-xs text-black">
-												{weekday}
-											</div>
-											<div className="text-[10px] text-gray-600 font-medium mt-0.5">
-												{dateStr}
-											</div>
+									<tr key={dayKey}>
+										<td className="projection-table__day text-center align-middle">
+											<div className="small">{weekday}</div>
+											<div className="small fw-normal">{dateStr}</div>
 										</td>
 
 										{renderSlotCells(classes, morningSlots)}
 
 										{hasLunchBreak && (
-											<td className="p-2 py-3 text-center bg-gray-100/50 border-b border-r border-gray-200 font-bold text-[11px] text-gray-400 tracking-wider select-none align-middle">
+											<td className="projection-table__lunch text-center align-middle">
 												LUNCH
 											</td>
 										)}
@@ -337,6 +311,6 @@ export default function Projections() {
 					</table>
 				</div>
 			)}
-		</div>
+		</Card>
 	);
 }

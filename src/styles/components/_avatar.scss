@@ -1,0 +1,30 @@
+.avatar-stack {
+	display: flex;
+
+	> * + * {
+		margin-left: -0.5rem;
+	}
+}
+
+.avatar {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 2rem;
+	width: 2rem;
+	border-radius: 50%;
+	@include hover-lift;
+	overflow: hidden;
+	background: $clay-surface;
+	font-size: 0.75rem;
+	color: $clay-text-muted;
+	box-shadow:
+		0 0 0 2px #fff,
+		$shadow-sm;
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+}

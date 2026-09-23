@@ -1,0 +1,18 @@
+.progress-brutal {
+	height: 1.5rem;
+	@include clay-inset($clay-radius-pill);
+	overflow: hidden;
+
+	@media (min-width: 476px) {
+		height: 3rem;
+	}
+
+	.progress-bar {
+		font-weight: 700;
+		font-size: 0.75rem;
+
+		@media (min-width: 476px) {
+			font-size: 1.25rem;
+		}
+	}
+}
