@@ -1,5 +1,8 @@
-import { LogOut, Menu, Search, X } from "lucide-react";
+import { Github, LogOut, Menu, Search, ShieldCheck, X } from "lucide-react";
 import { useEffect, useState } from "react";
+
+const SOURCE_CODE_URL =
+	"https://github.com/dev-himanshu-x/Attendance-cybervidya";
 
 const NAV_SECTIONS = [
 	{ id: "attendance", label: "Attendance" },
@@ -170,6 +173,22 @@ export default function AppHeader({
 						</div>
 					</div>
 				</>
+			)}
+
+			{!isAuthenticated && (
+				<div className="app-header__privacy-notice">
+					<ShieldCheck size={16} className="app-header__privacy-notice-icon" />
+					<span>Your data is safe with us.</span>
+					<a
+						href={SOURCE_CODE_URL}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="app-header__privacy-notice-link"
+					>
+						<Github size={14} />
+						View open-source code
+					</a>
+				</div>
 			)}
 		</header>
 	);

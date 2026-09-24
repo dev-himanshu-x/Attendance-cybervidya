@@ -19,6 +19,15 @@
 		transform: none;
 	}
 
+	&:focus {
+		outline: none;
+	}
+
+	&:focus-visible {
+		outline: 3px solid rgba($clay-accent, 0.35);
+		outline-offset: 2px;
+	}
+
 	&:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
@@ -46,6 +55,10 @@
 	&--outline-active {
 		background: $clay-accent;
 		color: #fff;
+
+		&:hover {
+			background: $clay-accent;
+		}
 	}
 
 	&--tinted {

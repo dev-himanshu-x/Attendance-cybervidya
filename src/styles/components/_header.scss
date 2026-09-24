@@ -159,6 +159,38 @@
 	}
 }
 
+.app-header__privacy-notice {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem;
+	margin-left: auto;
+	padding: 0.4rem 0.85rem;
+	border-radius: $clay-radius-pill;
+	background: $color-tinted-bg;
+	color: $clay-text;
+	font-size: 0.8rem;
+	font-weight: 600;
+}
+
+.app-header__privacy-notice-icon {
+	color: $status-good;
+	flex-shrink: 0;
+}
+
+.app-header__privacy-notice-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	color: $color-tinted-text;
+	text-decoration: none;
+	white-space: nowrap;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
 .app-sidebar {
 	position: fixed;
 	inset: 0;

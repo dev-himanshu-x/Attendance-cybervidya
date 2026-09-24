@@ -230,7 +230,9 @@ export default function Projections({
 				<div className="d-flex align-items-center gap-2">
 					<CalendarDays size={24} className="text-primary" />
 					<h3 className="text-brutal fs-6 fw-semibold mb-0">
-						Weekly Projection (Today Onwards)
+						Weekly Projection
+						<br />
+						(Today Onwards)
 					</h3>
 				</div>
 				<button
@@ -246,7 +248,7 @@ export default function Projections({
 				<p className="text-brutal small text-secondary mb-0">
 					Click on any class block to mark it as planned to miss:
 				</p>
-				<span className="d-md-none small text-secondary bg-light px-2 py-1 rounded-pill">
+				<span className="d-md-none small text-secondary bg-light px-2 py-1 rounded-pill text-nowrap flex-shrink-0">
 					Scroll →
 				</span>
 			</div>

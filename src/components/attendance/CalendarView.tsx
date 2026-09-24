@@ -372,7 +372,7 @@ export default function CalendarView({
 				</div>
 
 				{!loading && monthStats.total > 0 && (
-					<div className="d-flex flex-wrap gap-3 px-3 py-3 calendar-view__divider-bottom align-items-center justify-content-between calendar-view__summary">
+					<div className="d-flex flex-nowrap gap-2 px-3 py-3 calendar-view__divider-bottom align-items-center justify-content-between calendar-view__summary">
 						<div className="d-flex gap-2">
 							<Badge variant="present">
 								{monthStats.present + monthStats.adjusted} Present
@@ -469,13 +469,17 @@ export default function CalendarView({
 														<div className="mt-auto pt-2 d-flex flex-wrap gap-1">
 															{presentCount > 0 && (
 																<span className="calendar-view__chip calendar-view__chip--present">
-																	<span className="calendar-view__chip-dot" />
+																	<span className="calendar-view__chip-label">
+																		P
+																	</span>
 																	{presentCount}
 																</span>
 															)}
 															{absentCount > 0 && (
 																<span className="calendar-view__chip calendar-view__chip--absent">
-																	<span className="calendar-view__chip-dot" />
+																	<span className="calendar-view__chip-label">
+																		A
+																	</span>
 																	{absentCount}
 																</span>
 															)}

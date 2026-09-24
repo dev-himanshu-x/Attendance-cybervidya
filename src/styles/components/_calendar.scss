@@ -79,6 +79,13 @@
 	font-weight: 700;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
+	white-space: nowrap;
+
+	// Dropped first so the present/absent badges and the ring always share
+	// one line instead of wrapping onto a second row on narrow screens.
+	@media (max-width: 400px) {
+		display: none;
+	}
 }
 
 .calendar-view__ring {
@@ -244,25 +251,15 @@
 	}
 }
 
-.calendar-view__chip-dot {
-	width: 0.4rem;
-	height: 0.4rem;
-	border-radius: 50%;
+.calendar-view__chip-label {
+	font-weight: 900;
 	flex-shrink: 0;
 }
 
 .calendar-view__chip--present {
 	color: $color-present-text;
-
-	.calendar-view__chip-dot {
-		background: $color-present-text;
-	}
 }
 
 .calendar-view__chip--absent {
 	color: $color-danger-text;
-
-	.calendar-view__chip-dot {
-		background: $color-danger-text;
-	}
 }
