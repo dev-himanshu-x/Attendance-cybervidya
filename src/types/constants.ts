@@ -40,7 +40,6 @@ export const REMEMBER_ME_COOKIE_NAME = "remember_me";
 export const PASSWORD_COOKIE_NAME = "password";
 export const COOKIE_EXPIRY = 7; // Days
 export const STUDENT_ID_COOKIE_NAME = "studentId";
-export const TARGET_PERCENTAGE_COOKIE_NAME = "target_percentage";
 export const DEFAULT_TARGET_PERCENTAGE = 75;
 export const MIN_TARGET_PERCENTAGE = 60;
 export const MAX_TARGET_PERCENTAGE = 100;

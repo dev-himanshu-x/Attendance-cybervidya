@@ -28,6 +28,11 @@ function App() {
 	const attendanceQuery = useAttendanceQuery(token);
 
 	useEffect(() => {
+		// Target percentage is no longer persisted; drop any leftover cookie.
+		Cookies.remove("target_percentage");
+	}, []);
+
+	useEffect(() => {
 		if (hasHandledUrlTokenRef.current) return;
 		const searchParams = new URLSearchParams(window.location.search);
 		const urlToken = searchParams.get("token");

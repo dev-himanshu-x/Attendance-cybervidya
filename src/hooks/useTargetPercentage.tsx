@@ -1,4 +1,3 @@
-import Cookies from "js-cookie";
 import type { ReactNode } from "react";
 import {
 	createContext,
@@ -8,24 +7,10 @@ import {
 	useState,
 } from "react";
 import {
-	COOKIE_EXPIRY,
 	DEFAULT_TARGET_PERCENTAGE,
 	MAX_TARGET_PERCENTAGE,
 	MIN_TARGET_PERCENTAGE,
-	TARGET_PERCENTAGE_COOKIE_NAME,
 } from "../types/constants";
-
-function readStoredTarget(): number {
-	const cookieVal = Number(Cookies.get(TARGET_PERCENTAGE_COOKIE_NAME));
-	if (
-		Number.isFinite(cookieVal) &&
-		cookieVal >= MIN_TARGET_PERCENTAGE &&
-		cookieVal <= MAX_TARGET_PERCENTAGE
-	) {
-		return cookieVal;
-	}
-	return DEFAULT_TARGET_PERCENTAGE;
-}
 
 interface TargetPercentageContextValue {
 	targetPercentage: number;
@@ -41,17 +26,15 @@ export function TargetPercentageProvider({
 }: {
 	children: ReactNode;
 }) {
-	const [targetPercentage, setTargetPercentageState] =
-		useState<number>(readStoredTarget);
+	const [targetPercentage, setTargetPercentageState] = useState<number>(
+		DEFAULT_TARGET_PERCENTAGE,
+	);
 
 	const setTargetPercentage = useCallback((value: number) => {
 		const clamped = Math.min(
 			MAX_TARGET_PERCENTAGE,
 			Math.max(MIN_TARGET_PERCENTAGE, value),
 		);
-		Cookies.set(TARGET_PERCENTAGE_COOKIE_NAME, String(clamped), {
-			expires: COOKIE_EXPIRY * 52,
-		});
 		setTargetPercentageState(clamped);
 	}, []);
 
