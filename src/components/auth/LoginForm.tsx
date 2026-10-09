@@ -175,7 +175,7 @@ function LoginForm() {
 		<div className="flex flex-col my-12 items-center justify-center p-6">
 			<div className="auth-card w-full fade-in" style={{ maxWidth: "28rem" }}>
 				<div className="auth-card__body">
-					<div className="auth-logo mb-6">
+					<div className="auth-logo text-center mb-6">
 						Cyber<span className="auth-logo__accent">Vidya</span>
 					</div>
 					<div className="text-center mb-6">

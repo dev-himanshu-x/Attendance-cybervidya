@@ -1,5 +1,4 @@
 .auth-logo {
-	text-align: center;
 	font-size: 1.5rem;
 	font-weight: 800;
 	letter-spacing: -0.01em;
@@ -12,7 +11,7 @@
 
 .auth-card {
 	background: var(--clay-surface-alt);
-	border: 1px solid rgba(163, 177, 198, 0.3);
+	border: 1px solid var(--clay-divider);
 	border-radius: 1rem;
 	box-shadow:
 		0 1px 2px rgba(15, 23, 42, 0.04),
@@ -30,7 +29,7 @@
 	text-align: center;
 	color: var(--clay-muted);
 	background: var(--clay-surface);
-	border-top: 1px solid rgba(163, 177, 198, 0.25);
+	border-top: 1px solid var(--clay-raised-border);
 }
 
 .auth-card__footer--notice {
@@ -48,22 +47,4 @@
 	flex: none;
 	accent-color: var(--clay-accent);
 	cursor: pointer;
-}
-
-.form-control-brutal--with-icon-start {
-	padding-left: 2.75rem;
-}
-
-.form-field {
-	position: relative;
-}
-
-.form-field__icon {
-	position: absolute;
-	top: 50%;
-	left: 1rem;
-	transform: translateY(-50%);
-	color: var(--clay-muted);
-	pointer-events: none;
-	display: flex;
 }

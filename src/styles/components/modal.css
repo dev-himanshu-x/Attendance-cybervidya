@@ -27,7 +27,7 @@
 	max-height: 85vh;
 	display: flex;
 	flex-direction: column;
-	border: 1px solid rgba(163, 177, 198, 0.25);
+	border: 1px solid var(--clay-raised-border);
 	border-radius: var(--clay-radius-lg);
 	background: var(--clay-surface-alt);
 	box-shadow: none;
@@ -41,7 +41,7 @@
 }
 
 .modal-panel--soft {
-	background: rgba(255, 255, 255, 0.9);
+	background: var(--modal-soft-bg);
 	backdrop-filter: blur(8px);
 	max-height: none;
 }

@@ -1,5 +1,12 @@
 import Cookies from "js-cookie";
-import { CalendarDays, LayoutGrid, SearchX, X } from "lucide-react";
+import {
+	CalendarDays,
+	LayoutGrid,
+	LogOut,
+	Search,
+	SearchX,
+	X,
+} from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuthToken } from "../../hooks/useAuthToken";
 import { useAttendanceQuery } from "../../queries/useAttendanceQuery";
@@ -10,6 +17,7 @@ import type {
 	AttendanceComponentInfo,
 	CourseAttendanceInfo,
 } from "../../types/response";
+import ThemeToggle from "../layout/ThemeToggle";
 import Button from "../ui/Button";
 import Modal from "../ui/Modal";
 import CalendarView from "./CalendarView";
@@ -27,9 +35,15 @@ export interface SelectedComponentType {
 
 interface AttendanceProps {
 	searchQuery: string;
+	onSearchChange: (value: string) => void;
+	onLogout: () => void;
 }
 
-function Attendance({ searchQuery }: AttendanceProps) {
+function Attendance({
+	searchQuery,
+	onSearchChange,
+	onLogout,
+}: AttendanceProps) {
 	const { token } = useAuthToken();
 	const attendanceQuery = useAttendanceQuery(token);
 	const attendanceData = attendanceQuery.data ?? null;
@@ -110,6 +124,37 @@ function Attendance({ searchQuery }: AttendanceProps) {
 	return (
 		<div className="grow flex flex-col">
 			<div className="w-full px-4 py-6 lg:px-6">
+				<div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
+					<div className="auth-logo shrink-0">
+						Cyber<span className="auth-logo__accent">Vidya</span>
+					</div>
+
+					<div className="flex items-center gap-3">
+						<div className="form-field grow max-w-sm h-11">
+							<span className="form-field__icon">
+								<Search size={16} />
+							</span>
+							<input
+								type="search"
+								placeholder="Search courses..."
+								value={searchQuery}
+								onChange={(e) => onSearchChange(e.target.value)}
+								aria-label="Search courses"
+								className="form-control-brutal form-control-brutal--with-icon-start h-11"
+							/>
+						</div>
+						<ThemeToggle />
+						<button
+							type="button"
+							onClick={onLogout}
+							className="btn-brutal btn-brutal--outline shrink-0 h-11"
+						>
+							<LogOut size={14} />
+							Logout
+						</button>
+					</div>
+				</div>
+
 				{isSearching ? (
 					<div id="search-results">
 						<h2 className="text-xl font-bold text-brutal mb-6">

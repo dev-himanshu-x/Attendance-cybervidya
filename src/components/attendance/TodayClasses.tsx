@@ -52,13 +52,6 @@ export default function TodayClasses({
 	isProjectionVisible,
 	onToggleProjection,
 }: TodayClassesProps) {
-	const calendarQuery = useCalendarAttendanceQuery(
-		token,
-		studentId,
-		attendanceData,
-	);
-	const todayEntries = calendarQuery.data?.[toDateKey(new Date())] ?? [];
-
 	const todaysClasses = useMemo(() => {
 		const todayStr = toLectureDateString(new Date());
 		return schedule
@@ -67,6 +60,21 @@ export default function TodayClasses({
 			)
 			.sort((a, b) => a.start.localeCompare(b.start));
 	}, [schedule]);
+
+	// Only fetch attendance history for the courses meeting today, not the
+	// student's whole course list — these badges only need today's row.
+	const todaysCourseCodes = useMemo(
+		() => new Set(todaysClasses.map((cls) => cls.courseCode)),
+		[todaysClasses],
+	);
+
+	const calendarQuery = useCalendarAttendanceQuery(
+		token,
+		studentId,
+		attendanceData,
+		todaysCourseCodes,
+	);
+	const todayEntries = calendarQuery.data?.[toDateKey(new Date())] ?? [];
 
 	return (
 		<Card className="h-full flex flex-col">

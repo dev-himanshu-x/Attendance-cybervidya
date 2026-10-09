@@ -70,7 +70,7 @@ function Daywise({ token, payload }: DaywiseProps) {
 				Scroll →
 			</span>
 			<div
-				className="table-scroll table-scroll--hidden bg-white"
+				className="table-scroll table-scroll--hidden"
 				style={{ maxHeight: "500px", overflowY: "auto" }}
 			>
 				<table className="table-brutal mb-0 text-nowrap">

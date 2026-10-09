@@ -335,7 +335,6 @@ export default function CalendarView({
 	return (
 		<>
 			<div className="card-panel calendar-view__card fade-in mb-6 p-0 overflow-hidden">
-				<div className="calendar-view__glow" aria-hidden="true" />
 				<div className="flex items-center justify-between px-4 py-4 calendar-view__divider-bottom relative">
 					<button
 						type="button"

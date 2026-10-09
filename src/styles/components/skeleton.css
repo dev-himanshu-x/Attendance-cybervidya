@@ -5,5 +5,5 @@
 }
 
 .skeleton--light {
-	background: #f3f7fc;
+	background: var(--clay-skeleton-light);
 }

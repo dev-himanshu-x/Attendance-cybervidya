@@ -5,6 +5,7 @@ import App from "./App.tsx";
 import { ToastProvider } from "./components/ui/toast/ToastProvider.tsx";
 import { AuthTokenProvider } from "./hooks/useAuthToken.tsx";
 import { TargetPercentageProvider } from "./hooks/useTargetPercentage.tsx";
+import { ThemeProvider } from "./hooks/useTheme.tsx";
 import { queryClient } from "./lib/queryClient.ts";
 import "./styles/main.css";
 
@@ -14,14 +15,16 @@ if (!rootElement) throw new Error("Root element not found");
 
 createRoot(rootElement).render(
 	<StrictMode>
-		<QueryClientProvider client={queryClient}>
-			<AuthTokenProvider>
-				<TargetPercentageProvider>
-					<ToastProvider>
-						<App />
-					</ToastProvider>
-				</TargetPercentageProvider>
-			</AuthTokenProvider>
-		</QueryClientProvider>
+		<ThemeProvider>
+			<QueryClientProvider client={queryClient}>
+				<AuthTokenProvider>
+					<TargetPercentageProvider>
+						<ToastProvider>
+							<App />
+						</ToastProvider>
+					</TargetPercentageProvider>
+				</AuthTokenProvider>
+			</QueryClientProvider>
+		</ThemeProvider>
 	</StrictMode>,
 );

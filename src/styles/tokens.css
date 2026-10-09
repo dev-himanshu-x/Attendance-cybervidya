@@ -1,6 +1,8 @@
-/* Design tokens — single source of truth for the app's "claymorphism" look.
-   Consumed both by the plain CSS below (var(--token)) and directly from JSX
-   via Tailwind arbitrary values, e.g. text-[var(--clay-muted)]. */
+/* Design tokens — single source of truth for the app's "claymorphism" look,
+   in both light and dark theme. Consumed both by the plain CSS below
+   (var(--token)) and directly from JSX via Tailwind arbitrary values, e.g.
+   text-[var(--clay-muted)]. The active theme is set as data-theme="light" |
+   "dark" on <html> by ThemeProvider (src/hooks/useTheme.tsx). */
 :root {
 	/* Base page tokens — breakpoints used by Tailwind utility classes in JSX
 	   match Tailwind's default scale (sm:640 md:768 lg:1024 xl:1280 2xl:1536). */
@@ -29,7 +31,7 @@
 	--clay-radius-pill: 999px;
 
 	--clay-accent: #3b82f6; /* soft blue accent */
-	--clay-accent-dark: #1f2937; /* charcoal used for primary CTAs */
+	--clay-accent-dark: #1f2937; /* charcoal used for the "today" calendar chip */
 
 	--clay-present: #86e0b8; /* softened emerald */
 	--clay-present-text: #0f9d63;
@@ -42,13 +44,70 @@
 	--clay-tinted-text: #3b82f6;
 	--clay-tinted-bg-hover: #d6e6fd;
 
+	--clay-highlight-bg: #f2ecfe;
+	--clay-highlight-text: #7c4fe0;
+
+	/* Hairline borders / tints — named by where they were used as Sass mixin
+	   constants, so every component's look maps 1:1 across both themes. */
+	--clay-raised-border: rgba(163, 177, 198, 0.25);
+	--clay-inset-border: rgba(163, 177, 198, 0.4);
+	--clay-divider: rgba(163, 177, 198, 0.3);
+	--clay-tint: rgba(163, 177, 198, 0.12);
+	--clay-hover-tint: #f6faff;
+	--clay-skeleton-light: #f3f7fc;
+	--clay-cell-sheen: linear-gradient(
+		180deg,
+		rgba(255, 255, 255, 0.5) 0%,
+		rgba(255, 255, 255, 0) 60%
+	);
+	--clay-chip-bg: rgba(255, 255, 255, 0.55);
+	--modal-soft-bg: rgba(255, 255, 255, 0.9);
+
 	/* Status palette (fixed — never themed), validated for CVD-safe separation. */
 	--status-good: #0ca30c;
 	--status-warning: #fab219;
 	--status-critical: #d03b3b;
+}
 
-	/* Distinct from the blue accent used by buttons/links, so highlight chips
-	   (e.g. a course code badge) don't visually merge with call-to-action buttons. */
-	--clay-highlight-bg: #f2ecfe;
-	--clay-highlight-text: #7c4fe0;
+/* ---- Dark theme ---- */
+:root[data-theme="dark"] {
+	--body-bg: #0b1120;
+	--body-color: #cbd5e1;
+	--link-color: #60a5fa;
+
+	--clay-page-gradient: linear-gradient(
+		180deg,
+		#0b1120 0%,
+		#0d1526 35%,
+		#10192b 75%,
+		#0b1120 100%
+	);
+	--clay-surface: #121a28;
+	--clay-surface-alt: #182132;
+	--clay-text: #e2e8f0;
+	--clay-muted: #8b96ab;
+
+	--clay-accent: #60a5fa;
+	--clay-accent-dark: #60a5fa;
+
+	--clay-tinted-bg: rgba(59, 130, 246, 0.16);
+	--clay-tinted-text: #8ab4fd;
+	--clay-tinted-bg-hover: rgba(59, 130, 246, 0.26);
+
+	--clay-highlight-bg: rgba(124, 79, 224, 0.18);
+	--clay-highlight-text: #c3a6fb;
+
+	--clay-raised-border: rgba(255, 255, 255, 0.08);
+	--clay-inset-border: rgba(255, 255, 255, 0.14);
+	--clay-divider: rgba(255, 255, 255, 0.1);
+	--clay-tint: rgba(255, 255, 255, 0.05);
+	--clay-hover-tint: rgba(255, 255, 255, 0.04);
+	--clay-skeleton-light: rgba(255, 255, 255, 0.08);
+	--clay-cell-sheen: linear-gradient(
+		180deg,
+		rgba(255, 255, 255, 0.06) 0%,
+		rgba(255, 255, 255, 0) 60%
+	);
+	--clay-chip-bg: rgba(255, 255, 255, 0.08);
+	--modal-soft-bg: rgba(20, 27, 40, 0.85);
 }

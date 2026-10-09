@@ -5,9 +5,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Attendance from "./components/attendance/Attendance";
 import LoginForm from "./components/auth/LoginForm";
 import TnC from "./components/auth/TnC";
-import AppHeader from "./components/layout/AppHeader";
 import ExtensionUpdateNotice from "./components/layout/ExtensionUpdateNotice";
 import Footer from "./components/layout/Footer";
+import ThemeToggle from "./components/layout/ThemeToggle";
 import { useAuthToken } from "./hooks/useAuthToken";
 import { useToast } from "./hooks/useToast";
 import {
@@ -65,26 +65,29 @@ function App() {
 		Cookies.remove(STUDENT_ID_COOKIE_NAME);
 	}, [queryClient, token, clearToken]);
 
+	const isAuthenticated = !!attendanceQuery.data;
+	// The dashboard carries its own inline theme toggle in its top bar;
+	// everywhere else (login, terms) gets the floating one.
+	const showFloatingToggle = isTnCVisible || !isAuthenticated;
+
 	return (
 		<div className="app-shell">
-			<AppHeader
-				searchQuery={searchQuery}
-				onSearchChange={setSearchQuery}
-				onLogout={attendanceQuery.data ? handleLogout : undefined}
-			/>
+			{showFloatingToggle && <ThemeToggle floating />}
 			<ExtensionUpdateNotice />
 			<div className="app-main">
-				{!attendanceQuery.data ? (
-					isTnCVisible ? (
-						<TnC setIsTnCVisible={setIsTnCVisible} />
-					) : (
-						<LoginForm />
-					)
+				{isTnCVisible ? (
+					<TnC setIsTnCVisible={setIsTnCVisible} />
+				) : isAuthenticated ? (
+					<Attendance
+						searchQuery={searchQuery}
+						onSearchChange={setSearchQuery}
+						onLogout={handleLogout}
+					/>
 				) : (
-					<Attendance searchQuery={searchQuery} />
+					<LoginForm />
 				)}
 			</div>
-			<Footer />
+			<Footer onShowTerms={() => setIsTnCVisible(true)} />
 			<Analytics />
 		</div>
 	);

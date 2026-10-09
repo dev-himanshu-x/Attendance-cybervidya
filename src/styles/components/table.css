@@ -9,7 +9,7 @@
 
 .table-brutal th,
 .table-brutal td {
-	border-bottom: 1px solid rgba(163, 177, 198, 0.25);
+	border-bottom: 1px solid var(--clay-raised-border);
 	padding: 0.625rem 0.75rem;
 }
 
@@ -21,7 +21,7 @@
 }
 
 .table-brutal tbody tr:hover {
-	background: #f6faff;
+	background: var(--clay-hover-tint);
 }
 
 .table-brutal tbody tr:last-child td {

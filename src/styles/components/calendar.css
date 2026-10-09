@@ -1,31 +1,13 @@
 .calendar-view__divider-bottom {
-	border-bottom: 1px solid rgba(163, 177, 198, 0.3);
+	border-bottom: 1px solid var(--clay-divider);
 }
 
 .calendar-view__divider-top {
-	border-top: 1px solid rgba(163, 177, 198, 0.3);
+	border-top: 1px solid var(--clay-divider);
 }
 
 .calendar-view__card {
 	position: relative;
-}
-
-/* Soft ambient color wash behind the header — purely decorative, clipped by
-   the card's own overflow: hidden. */
-.calendar-view__glow {
-	position: absolute;
-	top: -3rem;
-	left: 50%;
-	transform: translateX(-50%);
-	width: 18rem;
-	height: 10rem;
-	background: radial-gradient(
-		closest-side,
-		color-mix(in srgb, var(--clay-accent) 16%, transparent),
-		transparent
-	);
-	pointer-events: none;
-	z-index: 0;
 }
 
 .calendar-view__title {
@@ -173,13 +155,7 @@
 }
 
 .calendar-view__cell {
-	background:
-		linear-gradient(
-			180deg,
-			rgba(255, 255, 255, 0.5) 0%,
-			rgba(255, 255, 255, 0) 60%
-		),
-		var(--clay-surface);
+	background: var(--clay-cell-sheen), var(--clay-surface);
 	border-radius: var(--clay-radius-sm);
 	min-height: 4rem;
 	transition:
@@ -203,11 +179,7 @@
 .calendar-view__cell:not(.calendar-view__cell--empty):nth-child(7n + 1),
 .calendar-view__cell:not(.calendar-view__cell--empty):nth-child(7n) {
 	background:
-		linear-gradient(
-			180deg,
-			rgba(255, 255, 255, 0.5) 0%,
-			rgba(255, 255, 255, 0) 60%
-		),
+		var(--clay-cell-sheen),
 		color-mix(in srgb, var(--clay-accent) 6%, var(--clay-surface));
 }
 
@@ -277,7 +249,7 @@
 	line-height: 1;
 	padding: 0.3125rem 0.5rem;
 	border-radius: var(--clay-radius-pill);
-	background: rgba(255, 255, 255, 0.55);
+	background: var(--clay-chip-bg);
 	backdrop-filter: blur(3px);
 }
 

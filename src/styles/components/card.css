@@ -1,5 +1,5 @@
 .card-panel {
-	border: 1px solid rgba(163, 177, 198, 0.25);
+	border: 1px solid var(--clay-raised-border);
 	border-radius: var(--clay-radius-lg);
 	background: var(--clay-surface-alt);
 	box-shadow: none;
@@ -17,7 +17,7 @@
 }
 
 .course-card__divider {
-	border-top: 1px solid rgba(163, 177, 198, 0.3);
+	border-top: 1px solid var(--clay-divider);
 }
 
 .today-classes__item {

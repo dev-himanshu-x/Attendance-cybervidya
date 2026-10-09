@@ -15,7 +15,7 @@
 	flex-shrink: 0;
 	background: conic-gradient(
 		var(--ring-color) calc(var(--ring-value) * 1%),
-		rgba(163, 177, 198, 0.25) 0
+		var(--clay-raised-border) 0
 	);
 	transition:
 		--ring-value 0.35s ease,
@@ -28,7 +28,7 @@
 	inset: 1rem;
 	border-radius: 50%;
 	background: var(--clay-surface-alt);
-	border: 1px solid rgba(163, 177, 198, 0.25);
+	border: 1px solid var(--clay-raised-border);
 }
 
 .attendance-meter__value {
@@ -62,7 +62,7 @@
 	height: 0.625rem;
 	border-radius: var(--clay-radius-pill);
 	background: var(--clay-surface);
-	border: 1px solid rgba(163, 177, 198, 0.4);
+	border: 1px solid var(--clay-inset-border);
 	outline: none;
 	cursor: pointer;
 }

@@ -1,6 +1,6 @@
 .projection-table__wrap {
 	border-radius: var(--clay-radius-md);
-	border: 1px solid rgba(163, 177, 198, 0.25);
+	border: 1px solid var(--clay-raised-border);
 	background: var(--clay-surface-alt);
 }
 
@@ -13,8 +13,8 @@
 
 .projection-table th,
 .projection-table td {
-	border-bottom: 1px solid rgba(163, 177, 198, 0.25);
-	border-right: 1px solid rgba(163, 177, 198, 0.25);
+	border-bottom: 1px solid var(--clay-raised-border);
+	border-right: 1px solid var(--clay-raised-border);
 }
 
 .projection-table th:last-child,
@@ -57,7 +57,7 @@
 }
 
 .projection-table__lunch {
-	background: rgba(163, 177, 198, 0.12);
+	background: var(--clay-tint);
 	color: var(--clay-muted);
 	font-weight: 700;
 	text-transform: uppercase;
