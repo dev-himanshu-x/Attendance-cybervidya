@@ -10,23 +10,28 @@
 }
 
 .toast-brutal {
-	@include clay-raised($clay-radius-md);
+	border: 1px solid rgba(163, 177, 198, 0.25);
+	border-radius: var(--clay-radius-md);
+	background: var(--clay-surface-alt);
+	box-shadow: none;
 	padding: 0.75rem 1rem;
 	display: flex;
 	align-items: flex-start;
 	gap: 0.5rem;
 	font-size: 0.8rem;
 	animation: fadeIn 0.3s ease-out forwards;
+}
 
-	&--error {
-		background: #fdecec;
-	}
-	&--success {
-		background: #e1f7ec;
-	}
-	&--info {
-		background: #e9f2fe;
-	}
+.toast-brutal--error {
+	background: #fdecec;
+}
+
+.toast-brutal--success {
+	background: #e1f7ec;
+}
+
+.toast-brutal--info {
+	background: #e9f2fe;
 }
 
 .toast-brutal__icon {

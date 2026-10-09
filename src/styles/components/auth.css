@@ -1,0 +1,69 @@
+.auth-logo {
+	text-align: center;
+	font-size: 1.5rem;
+	font-weight: 800;
+	letter-spacing: -0.01em;
+	color: var(--clay-text);
+}
+
+.auth-logo__accent {
+	color: var(--clay-accent);
+}
+
+.auth-card {
+	background: var(--clay-surface-alt);
+	border: 1px solid rgba(163, 177, 198, 0.3);
+	border-radius: 1rem;
+	box-shadow:
+		0 1px 2px rgba(15, 23, 42, 0.04),
+		0 12px 28px rgba(15, 23, 42, 0.06);
+	overflow: hidden;
+}
+
+.auth-card__body {
+	padding: 2rem 1.75rem;
+}
+
+.auth-card__footer {
+	padding: 1rem 1.75rem;
+	font-size: 0.8125rem;
+	text-align: center;
+	color: var(--clay-muted);
+	background: var(--clay-surface);
+	border-top: 1px solid rgba(163, 177, 198, 0.25);
+}
+
+.auth-card__footer--notice {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.375rem;
+	font-size: 0.75rem;
+	background: var(--clay-surface-alt);
+}
+
+.auth-checkbox {
+	width: 1.125rem;
+	height: 1.125rem;
+	flex: none;
+	accent-color: var(--clay-accent);
+	cursor: pointer;
+}
+
+.form-control-brutal--with-icon-start {
+	padding-left: 2.75rem;
+}
+
+.form-field {
+	position: relative;
+}
+
+.form-field__icon {
+	position: absolute;
+	top: 50%;
+	left: 1rem;
+	transform: translateY(-50%);
+	color: var(--clay-muted);
+	pointer-events: none;
+	display: flex;
+}

@@ -67,8 +67,8 @@ const OverallAtt = memo(function OverallAtt({
 	);
 
 	return (
-		<Card className="mx-auto mb-4">
-			<div className="d-flex flex-column flex-md-row align-items-center gap-4">
+		<Card className="mx-auto mb-6">
+			<div className="flex flex-col md:flex-row items-center gap-6">
 				<div
 					className="attendance-meter"
 					style={
@@ -78,7 +78,7 @@ const OverallAtt = memo(function OverallAtt({
 						} as React.CSSProperties
 					}
 				>
-					<div className="d-flex flex-column align-items-center">
+					<div className="flex flex-col items-center">
 						<span className="attendance-meter__value">
 							{percentage.toFixed(1)}%
 						</span>
@@ -86,22 +86,24 @@ const OverallAtt = memo(function OverallAtt({
 					</div>
 				</div>
 
-				<div className="flex-grow-1 w-100">
-					<h1 className="fs-4 mb-1 fw-bold text-brutal">Overall Attendance</h1>
-					<div className="d-flex align-items-center gap-2 small fw-semibold mb-3 text-secondary">
+				<div className="grow w-full">
+					<h1 className="text-2xl mb-1 font-bold text-brutal">
+						Overall Attendance
+					</h1>
+					<div className="flex items-center gap-2 text-sm font-semibold mb-4 text-[var(--clay-muted)]">
 						<statusMeta.Icon size={16} color={statusMeta.color} />
 						{statusMeta.label} — {projection.message}
 					</div>
 
 					<div className="target-slider">
-						<div className="d-flex justify-content-between align-items-center mb-2">
+						<div className="flex justify-between items-center mb-2">
 							<label
 								htmlFor="target-percentage"
-								className="small fw-semibold text-secondary text-brutal mb-0"
+								className="text-sm font-semibold text-[var(--clay-muted)] text-brutal mb-0"
 							>
 								Target attendance
 							</label>
-							<span className="small fw-bold text-brutal">
+							<span className="text-sm font-bold text-brutal">
 								{targetPercentage}%
 							</span>
 						</div>

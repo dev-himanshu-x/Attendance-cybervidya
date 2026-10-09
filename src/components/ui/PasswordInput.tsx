@@ -13,7 +13,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
 			useState<boolean>(false);
 
 		return (
-			<div className="form-field d-flex align-items-center">
+			<div className="form-field flex items-center">
 				{icon && <span className="form-field__icon">{icon}</span>}
 				<input
 					id={id}
@@ -25,7 +25,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
 				<button
 					type="button"
 					onClick={() => togglePasswordVisibility(!isPasswordVisible)}
-					className="btn-brutal btn-brutal--plain position-absolute top-50 end-0 translate-middle-y me-3"
+					className="btn-brutal btn-brutal--plain absolute top-1/2 end-0 -translate-y-1/2 me-4"
 					aria-label={isPasswordVisible ? "Hide password" : "Show password"}
 				>
 					{isPasswordVisible ? <Eye size={18} /> : <EyeOff size={18} />}

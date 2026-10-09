@@ -195,7 +195,7 @@ export default function Projections({
 					return (
 						<td
 							key={slot.label}
-							className="projection-table__empty text-center small align-middle"
+							className="projection-table__empty text-center text-sm align-middle"
 						>
 							-
 						</td>
@@ -225,11 +225,11 @@ export default function Projections({
 	const dayEntries = Array.from(groupedSchedule.entries());
 
 	return (
-		<Card className="mb-4">
-			<div className="d-flex align-items-center justify-content-between gap-2 mb-1">
-				<div className="d-flex align-items-center gap-2">
-					<CalendarDays size={24} className="text-primary" />
-					<h3 className="text-brutal fs-6 fw-semibold mb-0">
+		<Card className="mb-6">
+			<div className="flex items-center justify-between gap-2 mb-1">
+				<div className="flex items-center gap-2">
+					<CalendarDays size={24} className="text-[var(--clay-accent)]" />
+					<h3 className="text-brutal text-base font-semibold mb-0">
 						Weekly Projection
 						<br />
 						(Today Onwards)
@@ -244,23 +244,23 @@ export default function Projections({
 					<X size={18} />
 				</button>
 			</div>
-			<div className="d-flex align-items-center justify-content-between gap-2 mb-3">
-				<p className="text-brutal small text-secondary mb-0">
+			<div className="flex items-center justify-between gap-2 mb-4">
+				<p className="text-brutal text-sm text-[var(--clay-muted)] mb-0">
 					Click on any class block to mark it as planned to miss:
 				</p>
-				<span className="d-md-none small text-secondary bg-light px-2 py-1 rounded-pill text-nowrap flex-shrink-0">
+				<span className="inline-block md:hidden text-sm text-[var(--clay-muted)] bg-[var(--clay-surface)] px-2 py-1 rounded-full whitespace-nowrap shrink-0">
 					Scroll →
 				</span>
 			</div>
 
 			{dayEntries.length === 0 ? (
-				<p className="text-brutal text-secondary">
+				<p className="text-brutal text-[var(--clay-muted)]">
 					No upcoming classes found for the rest of the week.
 				</p>
 			) : (
 				<div className="projection-table__wrap table-scroll">
 					<table
-						className="projection-table mb-0 small"
+						className="projection-table mb-0 text-sm"
 						style={{ minWidth: "960px" }}
 					>
 						<thead>
@@ -269,7 +269,7 @@ export default function Projections({
 									Day / Date
 								</th>
 								{morningSlots.map((slot) => (
-									<th key={slot.label} className="text-center fw-medium">
+									<th key={slot.label} className="text-center font-medium">
 										{slot.label}
 									</th>
 								))}
@@ -279,7 +279,7 @@ export default function Projections({
 								)}
 
 								{afternoonSlots.map((slot) => (
-									<th key={slot.label} className="text-center fw-medium">
+									<th key={slot.label} className="text-center font-medium">
 										{slot.label}
 									</th>
 								))}
@@ -293,8 +293,8 @@ export default function Projections({
 								return (
 									<tr key={dayKey}>
 										<td className="projection-table__day text-center align-middle">
-											<div className="small">{weekday}</div>
-											<div className="small fw-normal">{dateStr}</div>
+											<div className="text-sm">{weekday}</div>
+											<div className="text-sm font-normal">{dateStr}</div>
 										</td>
 
 										{renderSlotCells(classes, morningSlots)}

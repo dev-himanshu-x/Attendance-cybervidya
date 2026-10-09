@@ -10,8 +10,8 @@
 	position: relative;
 }
 
-// Soft ambient color wash behind the header — purely decorative, clipped by
-// the card's own overflow: hidden.
+/* Soft ambient color wash behind the header — purely decorative, clipped by
+   the card's own overflow: hidden. */
 .calendar-view__glow {
 	position: absolute;
 	top: -3rem;
@@ -19,13 +19,21 @@
 	transform: translateX(-50%);
 	width: 18rem;
 	height: 10rem;
-	background: radial-gradient(closest-side, rgba($clay-accent, 0.16), transparent);
+	background: radial-gradient(
+		closest-side,
+		color-mix(in srgb, var(--clay-accent) 16%, transparent),
+		transparent
+	);
 	pointer-events: none;
 	z-index: 0;
 }
 
 .calendar-view__title {
-	background: linear-gradient(160deg, $clay-text 20%, $clay-accent 120%);
+	background: linear-gradient(
+		160deg,
+		var(--clay-text) 20%,
+		var(--clay-accent) 120%
+	);
 	background-clip: text;
 	-webkit-background-clip: text;
 	color: transparent;
@@ -40,12 +48,12 @@
 		color 0.2s ease,
 		border-color 0.2s ease,
 		background 0.2s ease;
+}
 
-	&:hover {
-		color: #fff;
-		border-color: transparent;
-		background: linear-gradient(155deg, #60a5fa 0%, $clay-accent 100%);
-	}
+.calendar-view__nav-btn:hover {
+	color: #fff;
+	border-color: transparent;
+	background: linear-gradient(155deg, #60a5fa 0%, var(--clay-accent) 100%);
 }
 
 .calendar-view__today-link {
@@ -55,17 +63,21 @@
 	padding: 0;
 	font-size: 0.6875rem;
 	font-weight: 700;
-	color: $clay-accent;
+	color: var(--clay-accent);
 	text-decoration: underline;
 	text-underline-offset: 2px;
+}
 
-	&:hover {
-		color: $clay-accent-dark;
-	}
+.calendar-view__today-link:hover {
+	color: var(--clay-accent-dark);
 }
 
 .calendar-view__summary {
-	background: linear-gradient(180deg, rgba($clay-accent, 0.05) 0%, transparent 100%);
+	background: linear-gradient(
+		180deg,
+		color-mix(in srgb, var(--clay-accent) 5%, transparent) 0%,
+		transparent 100%
+	);
 }
 
 .calendar-view__attendance-summary {
@@ -80,10 +92,12 @@
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
 	white-space: nowrap;
+}
 
-	// Dropped first so the present/absent badges and the ring always share
-	// one line instead of wrapping onto a second row on narrow screens.
-	@media (max-width: 400px) {
+/* Dropped first so the present/absent badges and the ring always share
+   one line instead of wrapping onto a second row on narrow screens. */
+@media (max-width: 400px) {
+	.calendar-view__attendance-caption {
 		display: none;
 	}
 }
@@ -104,13 +118,15 @@
 	position: absolute;
 	font-size: 0.8125rem;
 	font-weight: 800;
-	color: $clay-text;
+	color: var(--clay-text);
 }
 
 .calendar-view__body {
 	padding-top: 0.75rem;
+}
 
-	@media (min-width: 640px) {
+@media (min-width: 640px) {
+	.calendar-view__body {
 		padding-top: 1rem;
 	}
 }
@@ -140,58 +156,73 @@
 .calendar-view__grid {
 	display: grid;
 	gap: 0.25rem;
+}
 
-	@media (min-width: 640px) {
+@media (min-width: 640px) {
+	.calendar-view__grid {
 		gap: 0.375rem;
-	}
-
-	&--next {
-		animation: calendarSlideNext 0.3s ease-out;
-	}
-
-	&--prev {
-		animation: calendarSlidePrev 0.3s ease-out;
 	}
 }
 
+.calendar-view__grid--next {
+	animation: calendarSlideNext 0.3s ease-out;
+}
+
+.calendar-view__grid--prev {
+	animation: calendarSlidePrev 0.3s ease-out;
+}
+
 .calendar-view__cell {
-	background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 60%), $clay-surface;
-	border-radius: $clay-radius-sm;
+	background:
+		linear-gradient(
+			180deg,
+			rgba(255, 255, 255, 0.5) 0%,
+			rgba(255, 255, 255, 0) 60%
+		),
+		var(--clay-surface);
+	border-radius: var(--clay-radius-sm);
 	min-height: 4rem;
 	transition:
 		background-color 0.15s ease,
 		outline-color 0.15s ease,
 		transform 0.15s ease;
+}
 
-	@media (min-width: 640px) {
+@media (min-width: 640px) {
+	.calendar-view__cell {
 		min-height: 5.5rem;
 	}
+}
 
-	&--empty {
-		background: transparent;
-	}
+.calendar-view__cell--empty {
+	background: transparent;
+}
 
-	// Sunday (1st column) and Saturday (7th column) get a faint tint so a
-	// week's boundaries are easy to scan at a glance.
-	&:not(&--empty):nth-child(7n + 1),
-	&:not(&--empty):nth-child(7n) {
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 60%),
-			color-mix(in srgb, $clay-accent 6%, $clay-surface);
-	}
+/* Sunday (1st column) and Saturday (7th column) get a faint tint so a
+   week's boundaries are easy to scan at a glance. */
+.calendar-view__cell:not(.calendar-view__cell--empty):nth-child(7n + 1),
+.calendar-view__cell:not(.calendar-view__cell--empty):nth-child(7n) {
+	background:
+		linear-gradient(
+			180deg,
+			rgba(255, 255, 255, 0.5) 0%,
+			rgba(255, 255, 255, 0) 60%
+		),
+		color-mix(in srgb, var(--clay-accent) 6%, var(--clay-surface));
+}
 
-	&--today {
-		outline: 1.5px solid rgba($clay-accent-dark, 0.28);
-		outline-offset: -1.5px;
-	}
+.calendar-view__cell--today {
+	outline: 1.5px solid
+		color-mix(in srgb, var(--clay-accent-dark) 28%, transparent);
+	outline-offset: -1.5px;
+}
 
-	&.cursor-pointer:hover,
-	&.cursor-pointer:focus-visible {
-		background: $color-tinted-bg;
-		outline: 1.5px solid rgba($clay-accent, 0.35);
-		outline-offset: -1.5px;
-		transform: translateY(-2px);
-	}
+.calendar-view__cell.cursor-pointer:hover,
+.calendar-view__cell.cursor-pointer:focus-visible {
+	background: var(--clay-tinted-bg);
+	outline: 1.5px solid color-mix(in srgb, var(--clay-accent) 35%, transparent);
+	outline-offset: -1.5px;
+	transform: translateY(-2px);
 }
 
 .calendar-view__day-num {
@@ -202,9 +233,11 @@
 	height: 1.75rem;
 	padding: 0 0.25rem;
 	font-size: 0.875rem;
-	border-radius: $clay-radius-pill;
+	border-radius: var(--clay-radius-pill);
+}
 
-	@media (min-width: 640px) {
+@media (min-width: 640px) {
+	.calendar-view__day-num {
 		font-size: 1rem;
 	}
 }
@@ -213,22 +246,24 @@
 	0%,
 	100% {
 		outline-width: 3px;
-		outline-color: rgba($clay-accent, 0.18);
+		outline-color: color-mix(in srgb, var(--clay-accent) 18%, transparent);
 	}
 	50% {
 		outline-width: 6px;
-		outline-color: rgba($clay-accent, 0.12);
+		outline-color: color-mix(in srgb, var(--clay-accent) 12%, transparent);
 	}
 }
 
 .calendar-view__today {
-	background: linear-gradient(160deg, #2b3646 0%, $clay-accent-dark 100%);
+	background: linear-gradient(160deg, #2b3646 0%, var(--clay-accent-dark) 100%);
 	color: #fff;
-	outline: 3px solid rgba($clay-accent, 0.18);
+	outline: 3px solid color-mix(in srgb, var(--clay-accent) 18%, transparent);
 	outline-offset: 0;
 	animation: calendarTodayPulse 2.4s ease-in-out infinite;
+}
 
-	@media (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
+	.calendar-view__today {
 		animation: none;
 	}
 }
@@ -241,11 +276,13 @@
 	font-weight: 800;
 	line-height: 1;
 	padding: 0.3125rem 0.5rem;
-	border-radius: $clay-radius-pill;
+	border-radius: var(--clay-radius-pill);
 	background: rgba(255, 255, 255, 0.55);
 	backdrop-filter: blur(3px);
+}
 
-	@media (min-width: 640px) {
+@media (min-width: 640px) {
+	.calendar-view__chip {
 		font-size: 0.6875rem;
 		padding: 0.3125rem 0.5625rem;
 	}
@@ -257,9 +294,9 @@
 }
 
 .calendar-view__chip--present {
-	color: $color-present-text;
+	color: var(--clay-present-text);
 }
 
 .calendar-view__chip--absent {
-	color: $color-danger-text;
+	color: var(--clay-danger);
 }

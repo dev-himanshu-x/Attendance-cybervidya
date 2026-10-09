@@ -5,7 +5,10 @@
 	width: 16rem;
 	padding: 4px;
 	user-select: none;
-	@include clay-inset($clay-radius-pill);
+	border: 1px solid rgba(163, 177, 198, 0.4);
+	border-radius: var(--clay-radius-pill);
+	background: var(--clay-surface);
+	box-shadow: none;
 }
 
 .toggle-switch__btn {
@@ -19,16 +22,16 @@
 	background: none;
 	border: none;
 	cursor: pointer;
-	color: $clay-text-muted;
+	color: var(--clay-muted);
 	transition: color 0.2s ease;
+}
 
-	&:hover {
-		color: $clay-text;
-	}
+.toggle-switch__btn:hover {
+	color: var(--clay-text);
+}
 
-	&--active {
-		color: #fff;
-	}
+.toggle-switch__btn--active {
+	color: #fff;
 }
 
 .toggle-switch__indicator {
@@ -37,11 +40,11 @@
 	bottom: 4px;
 	left: 4px;
 	width: calc(50% - 4px);
-	border-radius: $clay-radius-pill;
-	background: linear-gradient(160deg, #4c94f7 0%, $clay-accent 100%);
+	border-radius: var(--clay-radius-pill);
+	background: linear-gradient(160deg, #4c94f7 0%, var(--clay-accent) 100%);
 	transition: left 0.2s ease-in-out;
+}
 
-	&--right {
-		left: calc(50% + 0px);
-	}
+.toggle-switch__indicator--right {
+	left: calc(50% + 0px);
 }

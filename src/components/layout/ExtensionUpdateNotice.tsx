@@ -49,9 +49,9 @@ function ExtensionUpdateNotice() {
 
 	return (
 		<AlertBanner variant="warning">
-			<AlertTriangle className="flex-shrink-0 mt-1" size={22} />
+			<AlertTriangle className="shrink-0 mt-1" size={22} />
 			<div style={{ fontSize: "0.875rem" }}>
-				<p className="fw-bold mb-0">
+				<p className="font-bold mb-0">
 					Extension update required
 					{installedVersion ? ` (you have v${installedVersion})` : ""}
 				</p>
@@ -61,14 +61,14 @@ function ExtensionUpdateNotice() {
 					install the latest version (v
 					{REQUIRED_EXTENSION_VERSION}) to continue using the app:
 				</p>
-				<ol className="mt-2 mb-0 ps-3">
+				<ol className="mt-2 mb-0 ps-4">
 					<li>
 						Remove the old extension — Chrome: <code>chrome://extensions</code>{" "}
 						· Firefox: <code>about:addons</code>
 					</li>
 					<li>Download and install the latest version:</li>
 				</ol>
-				<div className="d-flex flex-wrap gap-2 mt-2">
+				<div className="flex flex-wrap gap-2 mt-2">
 					<a
 						href="https://github.com/AmanDevelops/attendance-kiet/releases/latest/download/chrome.zip"
 						className="btn-brutal btn-brutal--outline"
@@ -86,7 +86,7 @@ function ExtensionUpdateNotice() {
 			<button
 				type="button"
 				onClick={handleDismiss}
-				className="btn-brutal btn-brutal--plain ms-auto flex-shrink-0"
+				className="btn-brutal btn-brutal--plain ms-auto shrink-0"
 				aria-label="Dismiss extension update notice"
 			>
 				<X size={20} />

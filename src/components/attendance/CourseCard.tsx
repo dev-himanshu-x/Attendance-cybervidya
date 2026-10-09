@@ -21,15 +21,15 @@ function CourseCard({ onViewDaywiseAttendance, course }: CourseCardProps) {
 
 	return (
 		<Card>
-			<div className="d-flex justify-content-between align-items-start gap-2 mb-3">
-				<h3 className="fs-6 fw-bold text-secondary-emphasis mb-0 text-brutal">
+			<div className="flex justify-between items-start gap-2 mb-4">
+				<h3 className="text-base font-bold mb-0 text-brutal">
 					{course.courseName}
 				</h3>
-				<Badge size="sm" variant="highlight" className="flex-shrink-0">
+				<Badge size="sm" variant="highlight" className="shrink-0">
 					{course.courseCode}
 				</Badge>
 			</div>
-			<div className="d-flex flex-column gap-3">
+			<div className="flex flex-col gap-4">
 				{course.attendanceCourseComponentNameInfoList.map((component) => {
 					const projectedPresent =
 						component.numberOfPresent + component.numberOfExtraAttendance;
@@ -48,15 +48,17 @@ function CourseCard({ onViewDaywiseAttendance, course }: CourseCardProps) {
 					return (
 						<div
 							key={component.componentName}
-							className="pt-3 course-card__divider"
+							className="pt-4 course-card__divider"
 						>
-							<div className="d-flex justify-content-between align-items-center mb-2">
+							<div className="flex justify-between items-center mb-2">
 								<Badge size="sm" variant="neutral">
 									{component.componentName}
 								</Badge>
 								<span
-									className={`small fw-semibold ${
-										isOnTarget ? "text-success" : "text-danger"
+									className={`text-sm font-semibold ${
+										isOnTarget
+											? "text-[var(--status-good)]"
+											: "text-[var(--status-critical)]"
 									}`}
 								>
 									{`${projectedSubjectPercent.toFixed(1)}% ${component.isProjected ? "(Projected)" : ""}`}
@@ -73,13 +75,15 @@ function CourseCard({ onViewDaywiseAttendance, course }: CourseCardProps) {
 									}}
 								/>
 							</div>
-							<div className="small text-secondary text-end mb-2">
+							<div className="text-sm text-[var(--clay-muted)] text-right mb-2">
 								Present: {projectedPresent}/{projectedTotal}
 							</div>
-							<div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+							<div className="flex items-center justify-between flex-wrap gap-2">
 								<div
-									className={`d-flex align-items-center gap-2 small ${
-										isOnTarget ? "text-success" : "text-warning"
+									className={`flex items-center gap-2 text-sm ${
+										isOnTarget
+											? "text-[var(--status-good)]"
+											: "text-[var(--clay-warning)]"
 									}`}
 								>
 									{isOnTarget ? (
@@ -92,7 +96,7 @@ function CourseCard({ onViewDaywiseAttendance, course }: CourseCardProps) {
 								<button
 									type="button"
 									onClick={() => onViewDaywiseAttendance(course, component)}
-									className="btn-brutal btn-brutal--tinted flex-shrink-0"
+									className="btn-brutal btn-brutal--tinted shrink-0"
 								>
 									See Daywise Attendance
 								</button>

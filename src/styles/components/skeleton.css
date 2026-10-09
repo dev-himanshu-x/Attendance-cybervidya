@@ -1,0 +1,9 @@
+.skeleton {
+	background: var(--clay-surface);
+	border-radius: var(--clay-radius-sm);
+	animation: pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton--light {
+	background: #f3f7fc;
+}

@@ -22,28 +22,32 @@ export default function TnC({
 				Back
 			</button>
 
-			<header className="mb-4 pb-3 border-bottom">
-				<h1 className="fw-bold mb-2">Terms of Service &amp; Privacy Policy</h1>
-				<p className="text-secondary small">Last Updated: 31-01-2026</p>
+			<header className="mb-6 pb-4 border-b border-[rgba(163,177,198,0.25)]">
+				<h1 className="font-bold mb-2">
+					Terms of Service &amp; Privacy Policy
+				</h1>
+				<p className="text-[var(--clay-muted)] text-sm">
+					Last Updated: 31-01-2026
+				</p>
 			</header>
 
-			<div className="d-flex flex-column gap-4">
+			<div className="flex flex-col gap-6">
 				<section className="alert-callout alert-callout--danger">
 					<h3
-						className="fw-black text-uppercase mb-2"
+						className="font-black uppercase mb-2"
 						style={{ letterSpacing: "0.02em" }}
 					>
 						Strictly Personal Project - Disclaimer
 					</h3>
-					<p className="mb-2 fw-bold">
+					<p className="mb-2 font-bold">
 						PLEASE READ THIS CAREFULLY BEFORE PROCEEDING.
 					</p>
-					<p className="mb-3">
+					<p className="mb-4">
 						This Application is a <strong>personal project</strong> created
 						solely for the private use of its developer/creator. It is{" "}
 						<strong>NOT</strong> an official product of CyberVidya.
 					</p>
-					<p className="mb-3">
+					<p className="mb-4">
 						While the source code is hosted publicly (e.g., on GitHub) for
 						educational and portfolio purposes,{" "}
 						<strong>
@@ -51,7 +55,7 @@ export default function TnC({
 							or modification by any third party.
 						</strong>
 					</p>
-					<p className="mb-0 fst-italic">
+					<p className="mb-0 italic">
 						If you are not the creator and you choose to use this Application,
 						you do so entirely at your own risk. The creator expressly disclaims
 						any liability for any consequences resulting from your use of this
@@ -60,12 +64,12 @@ export default function TnC({
 				</section>
 
 				<section>
-					<h3 className="fw-bold mb-3">1. Nature of the Application</h3>
-					<p className="mb-3">
+					<h3 className="font-bold mb-4">1. Nature of the Application</h3>
+					<p className="mb-4">
 						This Application is a client-side interface designed to facilitate
 						access to attendance data.
 					</p>
-					<ul className="mb-3">
+					<ul className="mb-4">
 						<li>
 							<strong>No Server-Side Storage:</strong> We do not store your
 							passwords or academic records on our servers.
@@ -83,13 +87,13 @@ export default function TnC({
 				</section>
 
 				<section>
-					<h3 className="fw-bold mb-3">
+					<h3 className="font-bold mb-4">
 						2. Limitation of Liability &amp; Indemnification
 					</h3>
-					<p className="mb-3">
+					<p className="mb-4">
 						<strong>To the fullest extent permitted by Indian Law:</strong>
 					</p>
-					<ul className="mb-3">
+					<ul className="mb-4">
 						<li>
 							The creator shall not be liable for any direct, indirect,
 							incidental, special, consequential, or exemplary damages,
@@ -112,16 +116,16 @@ export default function TnC({
 				</section>
 
 				<section>
-					<h3 className="fw-bold mb-3">3. Compliance with Indian Laws</h3>
-					<p className="mb-3">
+					<h3 className="font-bold mb-4">3. Compliance with Indian Laws</h3>
+					<p className="mb-4">
 						This project is created with the intent of purely personal utility
 						and educational experimentation, protected under the principles of
 						fair dealing/fair use.
 					</p>
-					<p className="mb-3">
+					<p className="mb-4">
 						<strong>Notice to CyberVidya:</strong>
 					</p>
-					<p className="mb-3 bg-light p-3 rounded small border">
+					<p className="mb-4 bg-[var(--clay-surface)] p-4 rounded-[0.9rem] text-sm border border-[rgba(163,177,198,0.25)]">
 						"This software acts as a user-agent (browser extension/interface)
 						that automates the retrieval of data that the user is already
 						authorized to access via their official credentials. It does not
@@ -135,11 +139,11 @@ export default function TnC({
 				</section>
 
 				<section>
-					<h3 className="fw-bold mb-3">4. Data Privacy</h3>
-					<p className="mb-3">
+					<h3 className="font-bold mb-4">4. Data Privacy</h3>
+					<p className="mb-4">
 						Since the project is designed for personal use:
 					</p>
-					<ul className="mb-3">
+					<ul className="mb-4">
 						<li>
 							<strong>Credentials:</strong> Your credentials are sent only to
 							the official ERP. We do not see them.
@@ -153,7 +157,7 @@ export default function TnC({
 				</section>
 
 				<section>
-					<h3 className="fw-bold mb-3">5. Third-Party Services</h3>
+					<h3 className="font-bold mb-4">5. Third-Party Services</h3>
 					<p className="mb-0">
 						This Application interacts with the API provided by{" "}
 						<strong>CyberVidya</strong>. We claim no ownership over the data
@@ -164,7 +168,7 @@ export default function TnC({
 
 				<hr />
 
-				<footer className="small text-secondary fst-italic text-center">
+				<footer className="text-sm text-[var(--clay-muted)] italic text-center">
 					By using this software, you confirm that you have read, understood,
 					and agreed to these terms. If you do not agree, you must stop using
 					this Application immediately.

@@ -1,0 +1,54 @@
+/* Design tokens — single source of truth for the app's "claymorphism" look.
+   Consumed both by the plain CSS below (var(--token)) and directly from JSX
+   via Tailwind arbitrary values, e.g. text-[var(--clay-muted)]. */
+:root {
+	/* Base page tokens — breakpoints used by Tailwind utility classes in JSX
+	   match Tailwind's default scale (sm:640 md:768 lg:1024 xl:1280 2xl:1536). */
+	--body-bg: #eaf2fb; /* soft sky, solid fallback body background-color */
+	--body-color: #33415c;
+	--link-color: #3b82f6;
+	--font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+	/* ---- Claymorphism design tokens ---- */
+	--clay-page-gradient: linear-gradient(
+		180deg,
+		#bfe0fb 0%,
+		#dcedfb 35%,
+		#f6fafd 75%,
+		#ffffff 100%
+	);
+	--clay-surface: #eef4fb; /* base clay color things are "molded" from */
+	--clay-surface-alt: #ffffff;
+	--clay-text: #33415c; /* soft navy instead of pure black */
+	--clay-muted: #7c8aa5;
+
+	--clay-radius-sm: 0.9rem;
+	--clay-radius-md: 1.25rem;
+	--clay-radius-lg: 1.75rem;
+	--clay-radius-xl: 2rem;
+	--clay-radius-pill: 999px;
+
+	--clay-accent: #3b82f6; /* soft blue accent */
+	--clay-accent-dark: #1f2937; /* charcoal used for primary CTAs */
+
+	--clay-present: #86e0b8; /* softened emerald */
+	--clay-present-text: #0f9d63;
+	--clay-absent: #f0847b; /* softened coral instead of a hard red */
+	--clay-adjusted: #fbd97a; /* softened amber */
+	--clay-warning: #b8790f;
+	--clay-danger: #d1554b;
+
+	--clay-tinted-bg: #e6f0fe;
+	--clay-tinted-text: #3b82f6;
+	--clay-tinted-bg-hover: #d6e6fd;
+
+	/* Status palette (fixed — never themed), validated for CVD-safe separation. */
+	--status-good: #0ca30c;
+	--status-warning: #fab219;
+	--status-critical: #d03b3b;
+
+	/* Distinct from the blue accent used by buttons/links, so highlight chips
+	   (e.g. a course code badge) don't visually merge with call-to-action buttons. */
+	--clay-highlight-bg: #f2ecfe;
+	--clay-highlight-text: #7c4fe0;
+}

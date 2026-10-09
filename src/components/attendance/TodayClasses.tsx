@@ -69,9 +69,11 @@ export default function TodayClasses({
 	}, [schedule]);
 
 	return (
-		<Card className="h-100 d-flex flex-column">
-			<div className="d-flex align-items-center justify-content-between mb-3 gap-2">
-				<h3 className="fs-6 fw-bold text-brutal mb-0">Today's Classes</h3>
+		<Card className="h-full flex flex-col">
+			<div className="flex items-center justify-between mb-4 gap-2">
+				<h3 className="text-base font-bold text-brutal mb-0">
+					Today's Classes
+				</h3>
 				<Button
 					variant="tinted"
 					active={isProjectionVisible}
@@ -83,17 +85,17 @@ export default function TodayClasses({
 			</div>
 
 			{isLoading ? (
-				<div className="d-flex flex-column gap-2">
+				<div className="flex flex-col gap-2">
 					<Skeleton style={{ height: "2.5rem" }} />
 					<Skeleton style={{ height: "2.5rem" }} />
 				</div>
 			) : todaysClasses.length === 0 ? (
-				<div className="d-flex flex-column align-items-center text-center text-secondary py-3 flex-grow-1 justify-content-center">
+				<div className="flex flex-col items-center text-center text-[var(--clay-muted)] py-4 grow justify-center">
 					<CalendarClock size={28} className="mb-2" />
-					<p className="small mb-0">No classes scheduled today.</p>
+					<p className="text-sm mb-0">No classes scheduled today.</p>
 				</div>
 			) : (
-				<div className="d-flex flex-column gap-2">
+				<div className="flex flex-col gap-2">
 					{todaysClasses.map((cls) => {
 						const status = findAttendanceStatus(todayEntries, cls);
 						return (
@@ -101,21 +103,21 @@ export default function TodayClasses({
 								key={`${cls.courseCode}-${cls.start}`}
 								className="today-classes__item"
 							>
-								<div className="text-truncate">
-									<div className="small fw-semibold text-brutal text-truncate">
+								<div className="truncate">
+									<div className="text-sm font-semibold text-brutal truncate">
 										{cls.courseName}
 									</div>
 									<div
-										className="text-secondary text-truncate"
+										className="text-[var(--clay-muted)] truncate"
 										style={{ fontSize: "0.75rem" }}
 									>
 										{cls.courseCompName}
 										{cls.classRoom ? ` • ${cls.classRoom}` : ""}
 									</div>
 								</div>
-								<div className="d-flex flex-column align-items-end gap-1 flex-shrink-0">
+								<div className="flex flex-col items-end gap-1 shrink-0">
 									<span
-										className="text-secondary fw-semibold"
+										className="text-[var(--clay-muted)] font-semibold"
 										style={{ fontSize: "0.75rem" }}
 									>
 										{formatShortTime(cls.start)} - {formatShortTime(cls.end)}

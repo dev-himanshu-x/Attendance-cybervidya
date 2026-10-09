@@ -145,12 +145,12 @@ function DayModal({ dateKey, entries, onClose }: DayModalProps) {
 
 	return (
 		<Modal onClose={onClose}>
-			<div className="d-flex justify-content-between align-items-start gap-2 mb-4 pb-3 calendar-view__divider-bottom">
-				<div className="text-truncate">
-					<h2 className="fs-5 fw-bold text-brutal mb-0">
+			<div className="flex justify-between items-start gap-2 mb-6 pb-4 calendar-view__divider-bottom">
+				<div className="truncate">
+					<h2 className="text-xl font-bold text-brutal mb-0">
 						{formatDateLabel(dateKey)}
 					</h2>
-					<div className="d-flex flex-wrap gap-2 mt-2">
+					<div className="flex flex-wrap gap-2 mt-2">
 						<Badge variant="present">{presentCount} Present</Badge>
 						<Badge variant="absent">{absentCount} Absent</Badge>
 					</div>
@@ -158,24 +158,24 @@ function DayModal({ dateKey, entries, onClose }: DayModalProps) {
 				<button
 					type="button"
 					onClick={onClose}
-					className="btn-brutal btn-brutal--plain flex-shrink-0"
+					className="btn-brutal btn-brutal--plain shrink-0"
 					aria-label="Close"
 				>
 					<X size={24} />
 				</button>
 			</div>
 
-			<div className="modal-panel__body d-flex flex-column gap-3">
+			<div className="modal-panel__body flex flex-col gap-4">
 				{sorted.map((entry, i) => (
 					<div
 						// biome-ignore lint/suspicious/noArrayIndexKey: list by position
 						key={i}
 						className="card-panel card-panel--tight"
 					>
-						<div className="d-flex align-items-start justify-content-between gap-2">
-							<div className="text-truncate">
-								<p className="fw-bold text-brutal mb-1">{entry.courseName}</p>
-								<p className="small fw-semibold text-secondary mb-0">
+						<div className="flex items-start justify-between gap-2">
+							<div className="truncate">
+								<p className="font-bold text-brutal mb-1">{entry.courseName}</p>
+								<p className="text-sm font-semibold text-[var(--clay-muted)] mb-0">
 									{entry.componentName} • {entry.courseCode}
 								</p>
 							</div>
@@ -192,9 +192,9 @@ function DayModal({ dateKey, entries, onClose }: DayModalProps) {
 								{entry.attendance}
 							</Badge>
 						</div>
-						<div className="d-flex align-items-center gap-1 mt-2 fw-semibold text-secondary pt-2 calendar-view__divider-top">
+						<div className="flex items-center gap-1 mt-2 font-semibold text-[var(--clay-muted)] pt-2 calendar-view__divider-top">
 							<Clock size={16} />
-							<span className="small">{entry.timeSlot}</span>
+							<span className="text-sm">{entry.timeSlot}</span>
 						</div>
 					</div>
 				))}
@@ -206,9 +206,9 @@ function DayModal({ dateKey, entries, onClose }: DayModalProps) {
 // ── Loading Skeleton ────────────────────────────────────────────────────────
 function SkeletonCalendar() {
 	return (
-		<div className="calendar-view__body px-2 px-sm-3 pb-2 pb-sm-3">
+		<div className="calendar-view__body px-2 sm:px-4 pb-2 sm:pb-4">
 			<div
-				className="d-grid mb-1 mb-sm-2"
+				className="grid mb-1 sm:mb-2"
 				style={{ gridTemplateColumns: "repeat(7, 1fr)" }}
 			>
 				{DAY_NAMES.map((d) => (
@@ -334,9 +334,9 @@ export default function CalendarView({
 
 	return (
 		<>
-			<div className="card-panel calendar-view__card fade-in mb-4 p-0 overflow-hidden">
+			<div className="card-panel calendar-view__card fade-in mb-6 p-0 overflow-hidden">
 				<div className="calendar-view__glow" aria-hidden="true" />
-				<div className="d-flex align-items-center justify-content-between px-3 py-3 calendar-view__divider-bottom position-relative">
+				<div className="flex items-center justify-between px-4 py-4 calendar-view__divider-bottom relative">
 					<button
 						type="button"
 						onClick={prevMonth}
@@ -346,8 +346,8 @@ export default function CalendarView({
 						<ChevronLeft size={20} />
 					</button>
 
-					<div className="d-flex flex-column align-items-center">
-						<h2 className="fs-4 fw-bold mb-0 text-center calendar-view__title">
+					<div className="flex flex-col items-center">
+						<h2 className="text-2xl font-bold mb-0 text-center calendar-view__title">
 							{MONTH_NAMES[viewMonth]} {viewYear}
 						</h2>
 						{!isCurrentMonth && (
@@ -372,15 +372,15 @@ export default function CalendarView({
 				</div>
 
 				{!loading && monthStats.total > 0 && (
-					<div className="d-flex flex-nowrap gap-2 px-3 py-3 calendar-view__divider-bottom align-items-center justify-content-between calendar-view__summary">
-						<div className="d-flex gap-2">
+					<div className="flex flex-nowrap gap-2 px-4 py-4 calendar-view__divider-bottom items-center justify-between calendar-view__summary">
+						<div className="flex gap-2">
 							<Badge variant="present">
 								{monthStats.present + monthStats.adjusted} Present
 							</Badge>
 							<Badge variant="absent">{monthStats.absent} Absent</Badge>
 						</div>
 						<div className="calendar-view__attendance-summary">
-							<span className="calendar-view__attendance-caption text-secondary">
+							<span className="calendar-view__attendance-caption text-[var(--clay-muted)]">
 								This month
 							</span>
 							<AttendanceRing
@@ -397,15 +397,15 @@ export default function CalendarView({
 					{loading && <SkeletonCalendar />}
 
 					{!loading && (
-						<div className="calendar-view__body px-2 px-sm-3 pb-2 pb-sm-3">
+						<div className="calendar-view__body px-2 sm:px-4 pb-2 sm:pb-4">
 							<div
-								className="d-grid mb-1 mb-sm-2"
+								className="grid mb-1 sm:mb-2"
 								style={{ gridTemplateColumns: "repeat(7, 1fr)" }}
 							>
 								{DAY_NAMES.map((d) => (
 									<div
 										key={d}
-										className="text-center small fw-semibold text-secondary py-1 text-uppercase"
+										className="text-center text-sm font-semibold text-[var(--clay-muted)] py-1 uppercase"
 									>
 										{d}
 									</div>
@@ -444,7 +444,7 @@ export default function CalendarView({
 											key={idx}
 											role={hasClasses ? "button" : undefined}
 											tabIndex={hasClasses ? 0 : undefined}
-											className={`calendar-view__cell position-relative p-1 p-sm-2 ${day === null ? "calendar-view__cell--empty" : ""} ${hasClasses ? "cursor-pointer" : ""} ${isToday ? "calendar-view__cell--today" : ""}`}
+											className={`calendar-view__cell relative p-1 sm:p-2 ${day === null ? "calendar-view__cell--empty" : ""} ${hasClasses ? "cursor-pointer" : ""} ${isToday ? "calendar-view__cell--today" : ""}`}
 											onClick={() =>
 												hasClasses && day !== null && setSelectedDate(dateKey)
 											}
@@ -456,9 +456,9 @@ export default function CalendarView({
 											}
 										>
 											{day !== null && (
-												<div className="h-100 d-flex flex-column align-items-start">
+												<div className="h-full flex flex-col items-start">
 													<span
-														className={`calendar-view__day-num fw-bold ${
+														className={`calendar-view__day-num font-bold ${
 															isToday ? "calendar-view__today" : "text-brutal"
 														}`}
 													>
@@ -466,7 +466,7 @@ export default function CalendarView({
 													</span>
 
 													{hasClasses && (
-														<div className="mt-auto pt-2 d-flex flex-wrap gap-1">
+														<div className="mt-auto pt-2 flex flex-wrap gap-1">
 															{presentCount > 0 && (
 																<span className="calendar-view__chip calendar-view__chip--present">
 																	<span className="calendar-view__chip-label">

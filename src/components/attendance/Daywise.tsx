@@ -66,7 +66,7 @@ function Daywise({ token, payload }: DaywiseProps) {
 
 	return (
 		<div>
-			<span className="d-md-none small text-secondary bg-light px-2 py-1 rounded-pill d-inline-block mb-2">
+			<span className="inline-block md:hidden text-sm text-[var(--clay-muted)] bg-[var(--clay-surface)] px-2 py-1 rounded-full mb-2">
 				Scroll →
 			</span>
 			<div
@@ -95,8 +95,8 @@ function Daywise({ token, payload }: DaywiseProps) {
 								<tr key={`${lecture.planLecDate}-${lecture.timeSlot}`}>
 									<td>{formatDate(lecture.planLecDate)}</td>
 									<td>{lecture.dayName.substring(0, 3)}</td>
-									<td className="small">{lecture.timeSlot}</td>
-									<td className="fw-semibold">
+									<td className="text-sm">{lecture.timeSlot}</td>
+									<td className="font-semibold">
 										<Badge
 											size="sm"
 											variant={

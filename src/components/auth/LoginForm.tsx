@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { IdCard, Lock, LogIn } from "lucide-react";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -21,6 +21,9 @@ import {
 import InstallExtensionPage from "../docs/InstallExtensionPage";
 import Button from "../ui/Button";
 import PasswordInput from "../ui/PasswordInput";
+
+const SOURCE_CODE_URL =
+	"https://github.com/dev-himanshu-x/Attendance-cybervidya";
 
 const credentialsSchema = z.object({
 	username: z.string().min(1, "University roll number is required"),
@@ -169,137 +172,146 @@ function LoginForm() {
 		step === "credentials" ? loginMutation.isPending : otpMutation.isPending;
 
 	return (
-		<div className="d-flex flex-column my-5 align-items-center justify-content-center p-4">
-			<div
-				className="card-panel card-panel--sheen w-100 fade-in"
-				style={{ maxWidth: "28rem" }}
-			>
-				<div className="auth-icon-badge mb-4">
-					<LogIn size={32} />
-				</div>
-				{step === "credentials" ? (
-					<form
-						onSubmit={onCredentialsSubmit}
-						className="d-flex flex-column gap-4"
-					>
-						<div>
-							<label htmlFor="username" className="form-label-brutal">
-								University Roll Number
-							</label>
-							<div className="form-field">
-								<span className="form-field__icon">
-									<IdCard size={18} />
-								</span>
+		<div className="flex flex-col my-12 items-center justify-center p-6">
+			<div className="auth-card w-full fade-in" style={{ maxWidth: "28rem" }}>
+				<div className="auth-card__body">
+					<div className="auth-logo mb-6">
+						Cyber<span className="auth-logo__accent">Vidya</span>
+					</div>
+					<div className="text-center mb-6">
+						<h1 className="text-xl font-bold text-brutal mb-1">
+							{step === "credentials" ? "Welcome back!" : "Verify it's you"}
+						</h1>
+						<p className="text-sm text-[var(--clay-muted)] mb-0">
+							{step === "credentials"
+								? "Sign in to view your attendance"
+								: "Enter the OTP sent to your registered email"}
+						</p>
+					</div>
+					{step === "credentials" ? (
+						<form
+							onSubmit={onCredentialsSubmit}
+							className="flex flex-col gap-5"
+						>
+							<div>
+								<label htmlFor="username" className="form-label-brutal">
+									University roll number
+								</label>
 								<input
 									id="username"
 									type="text"
 									placeholder="20240XXXXXXXXXX"
-									className="form-control-brutal form-control-brutal--with-icon-start"
+									className="form-control-brutal"
 									{...credentialsForm.register("username")}
 								/>
+								{credentialsForm.formState.errors.username && (
+									<p className="form-error">
+										{credentialsForm.formState.errors.username.message}
+									</p>
+								)}
 							</div>
-							{credentialsForm.formState.errors.username && (
-								<p className="form-error">
-									{credentialsForm.formState.errors.username.message}
-								</p>
+							<div>
+								<label htmlFor="password" className="form-label-brutal">
+									Password
+								</label>
+								<PasswordInput {...credentialsForm.register("password")} />
+								{credentialsForm.formState.errors.password && (
+									<p className="form-error">
+										{credentialsForm.formState.errors.password.message}
+									</p>
+								)}
+							</div>
+							<div className="flex items-center gap-2">
+								<input
+									id="remember-me"
+									type="checkbox"
+									className="auth-checkbox"
+									{...credentialsForm.register("rememberMe")}
+								/>
+								<label
+									htmlFor="remember-me"
+									className="text-brutal font-semibold"
+									style={{ fontSize: "0.875rem" }}
+								>
+									Remember me
+								</label>
+							</div>
+
+							{credentialsForm.formState.errors.root && (
+								<AuthErrorBox
+									message={credentialsForm.formState.errors.root.message ?? ""}
+									isExtensionError={isExtensionError}
+									onViewGuide={() => setShowInstallPage(true)}
+									variant="warning"
+								/>
 							)}
-						</div>
-						<div>
-							<label htmlFor="password" className="form-label-brutal">
-								CyberVidya Password
-							</label>
-							<PasswordInput
-								icon={<Lock size={18} />}
-								{...credentialsForm.register("password")}
-							/>
-							{credentialsForm.formState.errors.password && (
-								<p className="form-error">
-									{credentialsForm.formState.errors.password.message}
-								</p>
+
+							<Button type="submit" variant="primary" disabled={isLoading}>
+								{isLoading ? "Loading..." : "Continue"}
+								{!isLoading && <ArrowRight size={16} />}
+							</Button>
+						</form>
+					) : (
+						<form onSubmit={onOtpSubmit} className="flex flex-col gap-5">
+							<div>
+								<label htmlFor="otp" className="form-label-brutal">
+									One-time password (OTP)
+								</label>
+								<input
+									id="otp"
+									type="text"
+									inputMode="numeric"
+									autoComplete="one-time-code"
+									maxLength={6}
+									placeholder="XXXXXX"
+									className="form-control-brutal"
+									{...otpForm.register("otp")}
+								/>
+								{otpForm.formState.errors.otp && (
+									<p className="form-error">
+										{otpForm.formState.errors.otp.message}
+									</p>
+								)}
+							</div>
+
+							{otpForm.formState.errors.root && (
+								<AuthErrorBox
+									message={otpForm.formState.errors.root.message ?? ""}
+									isExtensionError={isExtensionError}
+									onViewGuide={() => setShowInstallPage(true)}
+									variant="danger"
+								/>
 							)}
-						</div>
-						<div className="d-flex align-items-center justify-content-end">
-							<input
-								id="remember-me"
-								type="checkbox"
-								className="form-control-brutal"
-								style={{ width: "1.25rem", height: "1.25rem", flex: "none" }}
-								{...credentialsForm.register("rememberMe")}
-							/>
-							<label
-								htmlFor="remember-me"
-								className="ms-2 text-brutal fw-bold"
-								style={{ fontSize: "0.875rem" }}
+
+							<Button type="submit" variant="primary" disabled={isLoading}>
+								{isLoading ? "Verifying..." : "Verify OTP"}
+								{!isLoading && <ArrowRight size={16} />}
+							</Button>
+							<button
+								type="button"
+								onClick={() => {
+									setStep("credentials");
+									otpForm.clearErrors("root");
+									setIsExtensionError(false);
+								}}
+								className="btn-brutal btn-brutal--plain w-full text-center"
 							>
-								Remember me
-							</label>
-						</div>
+								Back to login
+							</button>
+						</form>
+					)}
+				</div>
 
-						{credentialsForm.formState.errors.root && (
-							<AuthErrorBox
-								message={credentialsForm.formState.errors.root.message ?? ""}
-								isExtensionError={isExtensionError}
-								onViewGuide={() => setShowInstallPage(true)}
-								variant="warning"
-							/>
-						)}
-
-						<Button type="submit" variant="primary" disabled={isLoading}>
-							{isLoading ? "Loading..." : "View Attendance"}
-						</Button>
-					</form>
-				) : (
-					<form onSubmit={onOtpSubmit} className="d-flex flex-column gap-4">
-						<div className="text-center text-secondary">
-							An OTP has been sent to your registered email address. Enter it
-							below to continue.
-						</div>
-						<div>
-							<label htmlFor="otp" className="form-label-brutal">
-								One-Time Password (OTP)
-							</label>
-							<input
-								id="otp"
-								type="text"
-								inputMode="numeric"
-								autoComplete="one-time-code"
-								maxLength={6}
-								placeholder="XXXXXX"
-								className="form-control-brutal"
-								{...otpForm.register("otp")}
-							/>
-							{otpForm.formState.errors.otp && (
-								<p className="form-error">
-									{otpForm.formState.errors.otp.message}
-								</p>
-							)}
-						</div>
-
-						{otpForm.formState.errors.root && (
-							<AuthErrorBox
-								message={otpForm.formState.errors.root.message ?? ""}
-								isExtensionError={isExtensionError}
-								onViewGuide={() => setShowInstallPage(true)}
-								variant="danger"
-							/>
-						)}
-
-						<Button type="submit" variant="primary" disabled={isLoading}>
-							{isLoading ? "Verifying..." : "Verify OTP"}
-						</Button>
-						<button
-							type="button"
-							onClick={() => {
-								setStep("credentials");
-								otpForm.clearErrors("root");
-								setIsExtensionError(false);
-							}}
-							className="btn-brutal btn-brutal--plain w-100 text-center"
-						>
-							Back to login
-						</button>
-					</form>
-				)}
+				<div className="auth-card__footer">
+					Your data stays in your browser.{" "}
+					<a href={SOURCE_CODE_URL} target="_blank" rel="noopener noreferrer">
+						View source
+					</a>
+				</div>
+				<div className="auth-card__footer auth-card__footer--notice">
+					<ShieldCheck size={14} />
+					Not affiliated with KIET or CyberVidya
+				</div>
 			</div>
 		</div>
 	);
@@ -320,12 +332,12 @@ function AuthErrorBox({
 }: AuthErrorBoxProps) {
 	return (
 		<div
-			className={`position-relative alert-callout alert-callout--${variant} text-brutal`}
+			className={`relative alert-callout alert-callout--${variant} text-brutal`}
 			style={{ fontSize: "0.875rem" }}
 		>
 			{isExtensionError && (
 				<span
-					className="badge-attendance badge-attendance--absent badge-attendance--sm position-absolute rounded-pill"
+					className="badge-attendance badge-attendance--absent badge-attendance--sm absolute rounded-full"
 					style={{ top: "-0.75rem", right: "-0.75rem" }}
 				>
 					New

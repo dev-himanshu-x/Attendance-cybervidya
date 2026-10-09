@@ -6,7 +6,7 @@ import { ToastProvider } from "./components/ui/toast/ToastProvider.tsx";
 import { AuthTokenProvider } from "./hooks/useAuthToken.tsx";
 import { TargetPercentageProvider } from "./hooks/useTargetPercentage.tsx";
 import { queryClient } from "./lib/queryClient.ts";
-import "./styles/main.scss";
+import "./styles/main.css";
 
 const rootElement = document.getElementById("root");
 

@@ -1,0 +1,25 @@
+.progress-brutal {
+	height: 1.5rem;
+	border: 1px solid rgba(163, 177, 198, 0.4);
+	border-radius: var(--clay-radius-pill);
+	background: var(--clay-surface);
+	box-shadow: none;
+	overflow: hidden;
+}
+
+@media (min-width: 476px) {
+	.progress-brutal {
+		height: 3rem;
+	}
+}
+
+.progress-brutal .progress-bar {
+	font-weight: 700;
+	font-size: 0.75rem;
+}
+
+@media (min-width: 476px) {
+	.progress-brutal .progress-bar {
+		font-size: 1.25rem;
+	}
+}

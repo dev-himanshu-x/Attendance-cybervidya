@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+@import "./tokens.css";
+@import "./animations.css";
+@import "./docs-page.css";
+@import "./components/card.css";
+@import "./components/button.css";
+@import "./components/badge.css";
+@import "./components/modal.css";
+@import "./components/skeleton.css";
+@import "./components/alert.css";
+@import "./components/table.css";
+@import "./components/toast.css";
+@import "./components/avatar.css";
+@import "./components/toggle-switch.css";
+@import "./components/form.css";
+@import "./components/progress.css";
+@import "./components/auth.css";
+@import "./components/meter.css";
+@import "./components/header.css";
+@import "./components/projection.css";
+@import "./components/calendar.css";
+
+body {
+	margin: 0;
+	background-color: var(--body-bg);
+	color: var(--body-color);
+	font-family: var(--font-sans);
+}
+
+a {
+	color: var(--link-color);
+}
+
+a:hover {
+	color: color-mix(in srgb, var(--link-color) 85%, black);
+}
+
+.app-shell {
+	min-height: 100vh;
+	background: var(--clay-page-gradient);
+	display: flex;
+	flex-direction: column;
+}
+
+.app-main {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.text-brutal {
+	font-family: var(--font-sans);
+	letter-spacing: 0.01em;
+	color: var(--clay-text);
+}
+
+.app-footer {
+	width: 100%;
+	padding: 0.75rem 1rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.app-footer__credit {
+	font-size: 0.8rem;
+	text-align: center;
+}
+
+.app-footer__links {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+	.app-footer {
+		position: relative;
+		flex-direction: row;
+		justify-content: flex-end;
+	}
+
+	.app-footer__credit {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		white-space: nowrap;
+	}
+}

@@ -108,42 +108,38 @@ function Attendance({ searchQuery }: AttendanceProps) {
 	if (!attendanceData) return null;
 
 	return (
-		<div className="flex-grow-1 d-flex flex-column">
-			<div className="container-fluid px-3 px-lg-4 py-4">
+		<div className="grow flex flex-col">
+			<div className="w-full px-4 py-6 lg:px-6">
 				{isSearching ? (
 					<div id="search-results">
-						<h2 className="fs-5 fw-bold text-brutal mb-4">
+						<h2 className="text-xl font-bold text-brutal mb-6">
 							Search results for "{trimmedSearchQuery}"
 						</h2>
 						{filteredCourses.length === 0 ? (
-							<div className="d-flex flex-column align-items-center text-center text-secondary py-5">
-								<SearchX size={36} className="mb-3" />
-								<p className="fw-semibold text-brutal mb-1">
+							<div className="flex flex-col items-center text-center text-[var(--clay-muted)] py-12">
+								<SearchX size={36} className="mb-4" />
+								<p className="font-semibold text-brutal mb-1">
 									No courses match "{trimmedSearchQuery}"
 								</p>
-								<p className="small mb-0">
+								<p className="text-sm mb-0">
 									Try a different course name or code.
 								</p>
 							</div>
 						) : (
-							<div className="row g-4">
+							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 								{filteredCourses.map((course) => (
-									<div
-										className="col-12 col-md-6 col-lg-4"
+									<CourseCard
 										key={course.courseCode}
-									>
-										<CourseCard
-											onViewDaywiseAttendance={handleViewDaywiseAttendance}
-											course={course}
-										/>
-									</div>
+										onViewDaywiseAttendance={handleViewDaywiseAttendance}
+										course={course}
+									/>
 								))}
 							</div>
 						)}
 					</div>
 				) : (
 					<>
-						<div id="overview" className="mb-4">
+						<div id="overview" className="mb-6">
 							<Profile attendanceData={attendanceData} />
 						</div>
 
@@ -151,20 +147,18 @@ function Attendance({ searchQuery }: AttendanceProps) {
 							<OverallAtt attendanceData={attendanceData} />
 						</div>
 
-						<div className="row g-4 mb-4">
-							<div className="col-12">
-								<TodayClasses
-									token={token}
-									studentId={studentId}
-									attendanceData={attendanceData}
-									schedule={scheduleQuery.data ?? []}
-									isLoading={scheduleQuery.isLoading}
-									isProjectionVisible={isProjectionVisible}
-									onToggleProjection={() =>
-										setIsProjectionVisible((prev) => !prev)
-									}
-								/>
-							</div>
+						<div className="mb-6">
+							<TodayClasses
+								token={token}
+								studentId={studentId}
+								attendanceData={attendanceData}
+								schedule={scheduleQuery.data ?? []}
+								isLoading={scheduleQuery.isLoading}
+								isProjectionVisible={isProjectionVisible}
+								onToggleProjection={() =>
+									setIsProjectionVisible((prev) => !prev)
+								}
+							/>
 						</div>
 
 						{isProjectionVisible && (
@@ -179,7 +173,7 @@ function Attendance({ searchQuery }: AttendanceProps) {
 
 						<div id="courses">
 							{/* View Mode Toggle */}
-							<div className="d-flex align-items-center justify-content-end gap-2 mb-4">
+							<div className="flex items-center justify-end gap-2 mb-6">
 								<Button
 									variant="outline"
 									active={viewMode === "card"}
@@ -201,17 +195,13 @@ function Attendance({ searchQuery }: AttendanceProps) {
 							</div>
 
 							{viewMode === "card" ? (
-								<div className="row g-4">
+								<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 									{filteredCourses.map((course) => (
-										<div
-											className="col-12 col-md-6 col-lg-4"
+										<CourseCard
 											key={course.courseCode}
-										>
-											<CourseCard
-												onViewDaywiseAttendance={handleViewDaywiseAttendance}
-												course={course}
-											/>
-										</div>
+											onViewDaywiseAttendance={handleViewDaywiseAttendance}
+											course={course}
+										/>
 									))}
 								</div>
 							) : (
@@ -228,17 +218,17 @@ function Attendance({ searchQuery }: AttendanceProps) {
 				{/* Modal to show daywise attendance */}
 				{isDaywiseModalOpen && selectedComponent && (
 					<Modal variant="soft" onClose={() => setIsDaywiseModalOpen(false)}>
-						<div className="d-flex justify-content-between align-items-center mb-3">
-							<h2 className="fs-5 mb-0">
+						<div className="flex justify-between items-center mb-4">
+							<h2 className="text-xl mb-0">
 								Daywise Attendance for{" "}
-								<span className="fw-bold">
+								<span className="font-bold">
 									{selectedComponent.course.courseName} -{" "}
 									{selectedComponent.component.componentName}
 								</span>
 							</h2>
 							<button
 								type="button"
-								className="btn-brutal btn-brutal--plain text-danger fs-4"
+								className="btn-brutal btn-brutal--plain text-[var(--clay-danger)] text-2xl"
 								onClick={() => setIsDaywiseModalOpen(false)}
 							>
 								<X />

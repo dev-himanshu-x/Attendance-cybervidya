@@ -3,7 +3,7 @@ import { Github, Linkedin } from "lucide-react";
 function Footer() {
 	return (
 		<footer className="app-footer">
-			<p className="app-footer__credit text-secondary mb-0">
+			<p className="app-footer__credit text-[var(--clay-muted)] mb-0">
 				Made with ❤️ by Himanshu Jaiswal
 			</p>
 			<div className="app-footer__links">
@@ -12,7 +12,7 @@ function Footer() {
 					target="_blank"
 					rel="noopener noreferrer"
 					aria-label="GitHub"
-					className="text-secondary"
+					className="text-[var(--clay-muted)]"
 				>
 					<Github size={26} />
 				</a>
@@ -21,7 +21,7 @@ function Footer() {
 					target="_blank"
 					rel="noopener noreferrer"
 					aria-label="LinkedIn"
-					className="text-secondary"
+					className="text-[var(--clay-muted)]"
 				>
 					<Linkedin size={26} />
 				</a>

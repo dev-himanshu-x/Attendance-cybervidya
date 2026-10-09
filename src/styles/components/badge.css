@@ -1,0 +1,51 @@
+.badge-attendance {
+	border: 1px solid rgba(163, 177, 198, 0.25);
+	border-radius: var(--clay-radius-pill);
+	background: var(--clay-surface-alt);
+	box-shadow: none;
+	font-family: var(--font-sans);
+	letter-spacing: 0.01em;
+	color: var(--clay-text);
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	font-size: 0.75rem;
+	font-weight: 900;
+	padding: 0.25rem 0.625rem;
+	white-space: nowrap;
+}
+
+.badge-attendance--present {
+	background: var(--clay-present);
+	color: #0a3d26;
+}
+
+.badge-attendance--absent {
+	background: var(--clay-absent);
+	color: #fff;
+}
+
+.badge-attendance--adjusted {
+	background: var(--clay-adjusted);
+	color: #593f04;
+}
+
+.badge-attendance--neutral {
+	background: var(--clay-surface);
+	color: var(--clay-muted);
+}
+
+.badge-attendance--tinted {
+	background: var(--clay-tinted-bg);
+	color: var(--clay-tinted-text);
+}
+
+.badge-attendance--highlight {
+	background: var(--clay-highlight-bg);
+	color: var(--clay-highlight-text);
+}
+
+.badge-attendance--sm {
+	font-size: 0.625rem;
+	padding: 0.125rem 0.375rem;
+}
