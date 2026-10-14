@@ -1,16 +1,28 @@
-// Login (encrypt) Response - triggers OTP to the user
+// Login (encrypt) Response - supports direct token return and OTP challenge fallback
 export interface EncryptLoginResponse {
-	data: {
-		transactionId: string;
+	token?: string;
+	id_token?: string;
+	transactionId?: string;
+	message?: string;
+	data?: {
+		token?: string;
+		transactionId?: string;
+		tfaEnable?: boolean;
+		maskEmail?: string;
+		counter?: number | string;
+		id?: number | string;
 	};
-	message: string;
 }
 
-// OTP Verify Response
+// Login / OTP Verify Response
 export interface LoginResponse {
-	data: {
-		token: string;
+	token?: string;
+	data?: {
+		token?: string;
+		auth_pref?: string;
+		id?: number | string;
 	};
+	message?: string;
 }
 
 // Attendance Data Response

@@ -105,44 +105,10 @@ function LoginForm() {
 		}
 	}
 
-	const onCredentialsSubmit = credentialsForm.handleSubmit(async (values) => {
-		credentialsForm.clearErrors("root");
-		setIsExtensionError(false);
-
-		try {
-			const data = await loginMutation.mutateAsync({
-				username: values.username,
-				password: values.password,
-			});
-			submittedRef.current = {
-				username: values.username,
-				password: values.password,
-				rememberMe: values.rememberMe ?? false,
-			};
-			setTransactionId(data.transactionId);
-			setStep("otp");
-		} catch (err) {
-			handleAuthError(err, credentialsForm, "Invalid Username or Password");
-		}
-	});
-
-	const onOtpSubmit = otpForm.handleSubmit(async (values) => {
-		otpForm.clearErrors("root");
-		setIsExtensionError(false);
-
-		let token = "";
-		try {
-			const data = await otpMutation.mutateAsync({
-				otp: values.otp,
-				transactionId,
-			});
-			token = data.token;
-		} catch (err) {
-			handleAuthError(err, otpForm, "Invalid or expired OTP");
-			return;
-		}
-
-		const submitted = submittedRef.current;
+	function completeLogin(
+		token: string,
+		submitted: { username: string; password: string; rememberMe: boolean },
+	) {
 		if (savedUsername !== submitted.username) {
 			Cookies.remove(STUDENT_ID_COOKIE_NAME);
 		}
@@ -162,6 +128,58 @@ function LoginForm() {
 		} else {
 			Cookies.remove(PASSWORD_COOKIE_NAME);
 		}
+	}
+
+	const onCredentialsSubmit = credentialsForm.handleSubmit(async (values) => {
+		credentialsForm.clearErrors("root");
+		setIsExtensionError(false);
+
+		try {
+			const result = await loginMutation.mutateAsync({
+				username: values.username,
+				password: values.password,
+			});
+			const submitted = {
+				username: values.username,
+				password: values.password,
+				rememberMe: values.rememberMe ?? false,
+			};
+			if (result.kind === "token") {
+				completeLogin(result.token, submitted);
+				return;
+			}
+			submittedRef.current = submitted;
+			setTransactionId(result.transactionId);
+			setStep("otp");
+		} catch (err) {
+			if (!axios.isAxiosError(err) && err instanceof Error) {
+				credentialsForm.setError("root", { message: err.message });
+				return;
+			}
+			handleAuthError(err, credentialsForm, "Invalid Username or Password");
+		}
+	});
+
+	const onOtpSubmit = otpForm.handleSubmit(async (values) => {
+		otpForm.clearErrors("root");
+		setIsExtensionError(false);
+
+		let token = "";
+		try {
+			token = await otpMutation.mutateAsync({
+				otp: values.otp,
+				transactionId,
+			});
+		} catch (err) {
+			if (!axios.isAxiosError(err) && err instanceof Error) {
+				otpForm.setError("root", { message: err.message });
+				return;
+			}
+			handleAuthError(err, otpForm, "Invalid or expired OTP");
+			return;
+		}
+
+		completeLogin(token, submittedRef.current);
 	});
 
 	if (showInstallPage) {
