@@ -1,6 +1,5 @@
 import { ChevronLeft, ChevronRight, Clock, X } from "lucide-react";
-import { useEffect, useId, useMemo, useState } from "react";
-import { useTargetPercentage } from "../../hooks/useTargetPercentage";
+import { useEffect, useMemo, useState } from "react";
 import { useToast } from "../../hooks/useToast";
 import type {
 	CourseDay,
@@ -33,9 +32,6 @@ const MONTH_NAMES = [
 	"December",
 ];
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-// Matches the "at risk" threshold used elsewhere (OverallAtt) so the same
-// percentage reads as the same color everywhere in the app.
-const STATUS_STEPS_BELOW_TARGET = 10;
 
 function formatDateLabel(dateKey: string): string {
 	const [y, m, d] = dateKey.split("-");
@@ -55,70 +51,6 @@ function timeSlotStartMinutes(timeSlot: string): number {
 	if (period === "PM" && hours !== 12) hours += 12;
 	if (period === "AM" && hours === 12) hours = 0;
 	return hours * 60 + minutes;
-}
-
-// ── Attendance Ring ──────────────────────────────────────────────────────────
-interface AttendanceRingProps {
-	percent: number;
-	color: string;
-	gradientFrom: string;
-	gradientTo: string;
-}
-
-function AttendanceRing({
-	percent,
-	color,
-	gradientFrom,
-	gradientTo,
-}: AttendanceRingProps) {
-	const size = 60;
-	const stroke = 6;
-	const radius = (size - stroke) / 2;
-	const circumference = 2 * Math.PI * radius;
-	const clamped = Math.min(100, Math.max(0, percent));
-	const offset = circumference * (1 - clamped / 100);
-	const gradientId = `calendar-ring-gradient-${useId()}`;
-
-	return (
-		<div className="calendar-view__ring" style={{ color }}>
-			<svg
-				width={size}
-				height={size}
-				viewBox={`0 0 ${size} ${size}`}
-				role="img"
-				aria-label={`${Math.round(percent)}% attendance this month`}
-			>
-				<defs>
-					<linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-						<stop offset="0%" stopColor={gradientFrom} />
-						<stop offset="100%" stopColor={gradientTo} />
-					</linearGradient>
-				</defs>
-				<circle
-					cx={size / 2}
-					cy={size / 2}
-					r={radius}
-					fill="none"
-					stroke="rgba(163, 177, 198, 0.22)"
-					strokeWidth={stroke}
-				/>
-				<circle
-					className="calendar-view__ring-progress"
-					cx={size / 2}
-					cy={size / 2}
-					r={radius}
-					fill="none"
-					stroke={`url(#${gradientId})`}
-					strokeWidth={stroke}
-					strokeLinecap="round"
-					strokeDasharray={circumference}
-					strokeDashoffset={offset}
-					transform={`rotate(-90 ${size / 2} ${size / 2})`}
-				/>
-			</svg>
-			<span className="calendar-view__ring-label">{Math.round(percent)}%</span>
-		</div>
-	);
 }
 
 // ── Day Detail Modal ────────────────────────────────────────────────────────
@@ -145,15 +77,17 @@ function DayModal({ dateKey, entries, onClose }: DayModalProps) {
 
 	return (
 		<Modal onClose={onClose}>
-			<div className="flex justify-between items-start gap-2 mb-6 pb-4 calendar-view__divider-bottom">
-				<div className="truncate">
-					<h2 className="text-xl font-bold text-brutal mb-0">
+			<div className="flex justify-between items-start sm:items-center gap-2 mb-6 pb-4 calendar-view__divider-bottom">
+				<div className="flex items-center gap-2 flex-wrap min-w-0">
+					<h2 className="text-base sm:text-xl font-bold text-brutal mb-0 whitespace-nowrap">
 						{formatDateLabel(dateKey)}
 					</h2>
-					<div className="flex flex-wrap gap-2 mt-2">
-						<Badge variant="present">{presentCount} Present</Badge>
-						<Badge variant="absent">{absentCount} Absent</Badge>
-					</div>
+					<Badge size="sm" variant="present">
+						{presentCount} Present
+					</Badge>
+					<Badge size="sm" variant="absent">
+						{absentCount} Absent
+					</Badge>
 				</div>
 				<button
 					type="button"
@@ -254,7 +188,6 @@ export default function CalendarView({
 	const [viewMonth, setViewMonth] = useState(today.getMonth());
 	const [selectedDate, setSelectedDate] = useState<string | null>(null);
 	const [direction, setDirection] = useState<"prev" | "next">("next");
-	const { targetPercentage } = useTargetPercentage();
 
 	useEffect(() => {
 		if (calendarQuery.isError) {
@@ -271,23 +204,6 @@ export default function CalendarView({
 		while (arr.length % 7 !== 0) arr.push(null);
 		return { cells: arr };
 	}, [viewYear, viewMonth]);
-
-	const monthStats = useMemo(() => {
-		let present = 0;
-		let absent = 0;
-		let adjusted = 0;
-		for (const [key, entries] of Object.entries(dayMap)) {
-			const [y, m] = key.split("-");
-			if (Number(y) === viewYear && Number(m) - 1 === viewMonth) {
-				for (const e of entries) {
-					if (e.attendance === "PRESENT") present++;
-					else if (e.attendance === "ABSENT") absent++;
-					else adjusted++;
-				}
-			}
-		}
-		return { present, absent, adjusted, total: present + absent + adjusted };
-	}, [dayMap, viewYear, viewMonth]);
 
 	const prevMonth = () => {
 		setDirection("prev");
@@ -315,26 +231,9 @@ export default function CalendarView({
 		setViewMonth(today.getMonth());
 	};
 
-	const attendancePercent =
-		monthStats.total > 0
-			? ((monthStats.present + monthStats.adjusted) / monthStats.total) * 100
-			: 0;
-	const attendanceStatus =
-		attendancePercent >= targetPercentage
-			? "good"
-			: attendancePercent >= targetPercentage - STATUS_STEPS_BELOW_TARGET
-				? "warning"
-				: "critical";
-	const attendanceColor = `var(--status-${attendanceStatus})`;
-	const attendanceGradient = {
-		good: { from: "#4ade80", to: "#0ca30c" },
-		warning: { from: "#fbbf24", to: "#fab219" },
-		critical: { from: "#f87171", to: "#d03b3b" },
-	}[attendanceStatus];
-
 	return (
 		<>
-			<div className="card-panel calendar-view__card fade-in mb-6 p-0 overflow-hidden">
+			<div className="card-panel calendar-view__card fade-in mb-6 overflow-hidden">
 				<div className="flex items-center justify-between px-4 py-4 calendar-view__divider-bottom relative">
 					<button
 						type="button"
@@ -369,28 +268,6 @@ export default function CalendarView({
 						<ChevronRight size={20} />
 					</button>
 				</div>
-
-				{!loading && monthStats.total > 0 && (
-					<div className="flex flex-nowrap gap-2 px-4 py-4 calendar-view__divider-bottom items-center justify-between calendar-view__summary">
-						<div className="flex gap-2">
-							<Badge variant="present">
-								{monthStats.present + monthStats.adjusted} Present
-							</Badge>
-							<Badge variant="absent">{monthStats.absent} Absent</Badge>
-						</div>
-						<div className="calendar-view__attendance-summary">
-							<span className="calendar-view__attendance-caption text-[var(--clay-muted)]">
-								This month
-							</span>
-							<AttendanceRing
-								percent={attendancePercent}
-								color={attendanceColor}
-								gradientFrom={attendanceGradient.from}
-								gradientTo={attendanceGradient.to}
-							/>
-						</div>
-					</div>
-				)}
 
 				<div>
 					{loading && <SkeletonCalendar />}

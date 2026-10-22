@@ -24,14 +24,17 @@
 
 .toast-brutal--error {
 	background: #fdecec;
+	color: var(--clay-danger);
 }
 
 .toast-brutal--success {
 	background: #e1f7ec;
+	color: var(--clay-present-text);
 }
 
 .toast-brutal--info {
 	background: #e9f2fe;
+	color: #1d4ed8;
 }
 
 .toast-brutal__icon {

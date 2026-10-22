@@ -69,6 +69,23 @@
 	background: var(--clay-accent);
 }
 
+.btn-brutal--accent {
+	background: linear-gradient(160deg, #4c94f7 0%, var(--clay-accent) 100%);
+	color: #fff;
+	border-color: transparent;
+	border-radius: 0.75rem;
+	padding: 0.75rem 1.25rem;
+	font-size: 0.875rem;
+}
+
+.btn-brutal--accent:hover {
+	background: linear-gradient(
+		160deg,
+		#3f82e0 0%,
+		color-mix(in srgb, var(--clay-accent) 85%, black) 100%
+	);
+}
+
 .btn-brutal--tinted {
 	background: var(--clay-tinted-bg);
 	color: var(--clay-tinted-text);

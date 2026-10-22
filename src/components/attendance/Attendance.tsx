@@ -150,7 +150,7 @@ function Attendance({
 							className="btn-brutal btn-brutal--outline shrink-0 h-11"
 						>
 							<LogOut size={14} />
-							Logout
+							<span className="btn-brutal__text">Logout</span>
 						</button>
 					</div>
 				</div>
@@ -263,8 +263,8 @@ function Attendance({
 				{/* Modal to show daywise attendance */}
 				{isDaywiseModalOpen && selectedComponent && (
 					<Modal variant="soft" onClose={() => setIsDaywiseModalOpen(false)}>
-						<div className="flex justify-between items-center mb-4">
-							<h2 className="text-xl mb-0">
+						<div className="flex justify-between items-center gap-2 mb-4">
+							<h2 className="text-xl mb-0 min-w-0">
 								Daywise Attendance for{" "}
 								<span className="font-bold">
 									{selectedComponent.course.courseName} -{" "}
@@ -273,7 +273,7 @@ function Attendance({
 							</h2>
 							<button
 								type="button"
-								className="btn-brutal btn-brutal--plain text-[var(--clay-danger)] text-2xl"
+								className="btn-brutal btn-brutal--plain text-[var(--clay-danger)] text-2xl shrink-0"
 								onClick={() => setIsDaywiseModalOpen(false)}
 							>
 								<X />

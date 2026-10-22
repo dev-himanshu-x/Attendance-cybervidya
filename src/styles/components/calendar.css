@@ -8,6 +8,12 @@
 
 .calendar-view__card {
 	position: relative;
+	/* .card-panel's own padding is declared after Tailwind in the cascade,
+	   so it wins over the `p-0` utility this component is rendered with —
+	   this rule is what actually zeroes it out (see the same gotcha noted
+	   in projection.css). The header/body rows below add their own
+	   padding, so the outer card must stay flush. */
+	padding: 0;
 }
 
 .calendar-view__title {
@@ -52,55 +58,6 @@
 
 .calendar-view__today-link:hover {
 	color: var(--clay-accent-dark);
-}
-
-.calendar-view__summary {
-	background: linear-gradient(
-		180deg,
-		color-mix(in srgb, var(--clay-accent) 5%, transparent) 0%,
-		transparent 100%
-	);
-}
-
-.calendar-view__attendance-summary {
-	display: flex;
-	align-items: center;
-	gap: 0.625rem;
-}
-
-.calendar-view__attendance-caption {
-	font-size: 0.6875rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
-	white-space: nowrap;
-}
-
-/* Dropped first so the present/absent badges and the ring always share
-   one line instead of wrapping onto a second row on narrow screens. */
-@media (max-width: 400px) {
-	.calendar-view__attendance-caption {
-		display: none;
-	}
-}
-
-.calendar-view__ring {
-	position: relative;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	flex-shrink: 0;
-}
-
-.calendar-view__ring-progress {
-	transition: stroke-dashoffset 0.6s cubic-bezier(0.34, 1.2, 0.64, 1);
-}
-
-.calendar-view__ring-label {
-	position: absolute;
-	font-size: 0.8125rem;
-	font-weight: 800;
-	color: var(--clay-text);
 }
 
 .calendar-view__body {
@@ -158,6 +115,12 @@
 	background: var(--clay-cell-sheen), var(--clay-surface);
 	border-radius: var(--clay-radius-sm);
 	min-height: 4rem;
+	/* Grid items default to min-width: auto, which floors a column's shrink
+	   at its content's intrinsic min-content width — with 7 columns that's
+	   what caused the whole grid to overflow a narrow (320px) viewport
+	   instead of the day-num pill / chips just scaling down with it. */
+	min-width: 0;
+	overflow: hidden;
 	transition:
 		background-color 0.15s ease,
 		outline-color 0.15s ease,
@@ -201,15 +164,18 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	min-width: 1.75rem;
-	height: 1.75rem;
-	padding: 0 0.25rem;
-	font-size: 0.875rem;
+	min-width: 1.25rem;
+	height: 1.25rem;
+	padding: 0 0.125rem;
+	font-size: 0.6875rem;
 	border-radius: var(--clay-radius-pill);
 }
 
 @media (min-width: 640px) {
 	.calendar-view__day-num {
+		min-width: 1.75rem;
+		height: 1.75rem;
+		padding: 0 0.25rem;
 		font-size: 1rem;
 	}
 }
@@ -243,11 +209,11 @@
 .calendar-view__chip {
 	display: inline-flex;
 	align-items: center;
-	gap: 0.3125rem;
-	font-size: 0.625rem;
+	gap: 0.1875rem;
+	font-size: 0.5625rem;
 	font-weight: 800;
 	line-height: 1;
-	padding: 0.3125rem 0.5rem;
+	padding: 0.1875rem 0.375rem;
 	border-radius: var(--clay-radius-pill);
 	background: var(--clay-chip-bg);
 	backdrop-filter: blur(3px);
@@ -255,6 +221,7 @@
 
 @media (min-width: 640px) {
 	.calendar-view__chip {
+		gap: 0.3125rem;
 		font-size: 0.6875rem;
 		padding: 0.3125rem 0.5625rem;
 	}

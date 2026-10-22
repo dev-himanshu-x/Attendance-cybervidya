@@ -33,7 +33,13 @@ function isBlockedResponse(err: unknown): boolean {
 function readSessionCache(key: string): DayMap | null {
 	try {
 		const raw = sessionStorage.getItem(key);
-		return raw ? (JSON.parse(raw) as DayMap) : null;
+		if (!raw) return null;
+		const parsed = JSON.parse(raw) as DayMap;
+		// An empty result is indistinguishable from a run that failed before
+		// fetching anything — never trust it, so one bad run (e.g. every
+		// request timing out) can't poison the cache for the rest of the
+		// session.
+		return Object.keys(parsed).length > 0 ? parsed : null;
 	} catch {
 		return null;
 	}
@@ -108,6 +114,7 @@ export function useCalendarAttendanceQuery(
 			);
 
 			const dayMap: DayMap = {};
+			let hadAnyError = false;
 
 			for (let i = 0; i < requests.length; i++) {
 				const req = requests[i];
@@ -127,6 +134,7 @@ export function useCalendarAttendanceQuery(
 						}
 					}
 				} catch (err) {
+					hadAnyError = true;
 					if (isBlockedResponse(err)) {
 						// The server is rejecting us outright — stop immediately
 						// instead of ploughing through the remaining requests.
@@ -140,7 +148,12 @@ export function useCalendarAttendanceQuery(
 				}
 			}
 
-			writeSessionCache(cacheKey, dayMap);
+			// Only cache a run that found something, or one that hit no errors
+			// at all (a genuinely empty semester) — never a run that came back
+			// empty because every request failed or the loop got cut short.
+			if (Object.keys(dayMap).length > 0 || !hadAnyError) {
+				writeSessionCache(cacheKey, dayMap);
+			}
 			return dayMap;
 		},
 		enabled: !!token && !!studentId && !!attendanceData,

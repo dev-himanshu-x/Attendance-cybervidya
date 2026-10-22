@@ -1,4 +1,4 @@
-import { CalendarClock, Wand2 } from "lucide-react";
+import { CalendarClock } from "lucide-react";
 import { useMemo } from "react";
 import { formatShortTime, toLectureDateString } from "../../lib/schedule";
 import {
@@ -85,10 +85,9 @@ export default function TodayClasses({
 				<Button
 					variant="tinted"
 					active={isProjectionVisible}
-					icon={<Wand2 size={14} />}
 					onClick={onToggleProjection}
 				>
-					{isProjectionVisible ? "Hide Projection" : "Weekly Projection"}
+					{isProjectionVisible ? "Hide Bunk Planner" : "Bunk Planner"}
 				</Button>
 			</div>
 
@@ -111,7 +110,7 @@ export default function TodayClasses({
 								key={`${cls.courseCode}-${cls.start}`}
 								className="today-classes__item"
 							>
-								<div className="truncate">
+								<div className="truncate min-w-0 flex-1">
 									<div className="text-sm font-semibold text-brutal truncate">
 										{cls.courseName}
 									</div>

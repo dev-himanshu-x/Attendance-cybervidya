@@ -1,7 +1,6 @@
 import { AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import { memo } from "react";
 import { useTargetPercentage } from "../../hooks/useTargetPercentage";
-import { calculateAttendanceProjection } from "../../lib/attendanceProjection";
 import {
 	MAX_TARGET_PERCENTAGE,
 	MIN_TARGET_PERCENTAGE,
@@ -60,15 +59,14 @@ const OverallAtt = memo(function OverallAtt({
 		},
 	}[status];
 
-	const projection = calculateAttendanceProjection(
-		presentClasses,
-		totalClasses,
-		targetPercentage,
-	);
+	const sliderFill =
+		((targetPercentage - MIN_TARGET_PERCENTAGE) /
+			(MAX_TARGET_PERCENTAGE - MIN_TARGET_PERCENTAGE)) *
+		100;
 
 	return (
-		<Card className="mx-auto mb-6">
-			<div className="flex flex-col md:flex-row items-center gap-6">
+		<Card className="mx-auto mb-6 card-panel--tight">
+			<div className="flex flex-col md:flex-row items-center gap-3">
 				<div
 					className="attendance-meter"
 					style={
@@ -87,16 +85,26 @@ const OverallAtt = memo(function OverallAtt({
 				</div>
 
 				<div className="grow w-full">
-					<h1 className="text-2xl mb-1 font-bold text-brutal">
-						Overall Attendance
-					</h1>
-					<div className="flex items-center gap-2 text-sm font-semibold mb-4 text-[var(--clay-muted)]">
-						<statusMeta.Icon size={16} color={statusMeta.color} />
-						{statusMeta.label} — {projection.message}
+					<div className="flex flex-wrap items-center justify-between gap-2">
+						<h1 className="text-xl font-bold text-brutal mb-0">
+							Overall Attendance
+						</h1>
+						<span
+							className="status-pill"
+							style={
+								{ "--pill-color": statusMeta.color } as React.CSSProperties
+							}
+						>
+							<statusMeta.Icon size={14} />
+							{statusMeta.label}
+						</span>
 					</div>
 
-					<div className="target-slider">
-						<div className="flex justify-between items-center mb-2">
+					<div
+						className="target-slider mt-2"
+						style={{ "--slider-fill": `${sliderFill}%` } as React.CSSProperties}
+					>
+						<div className="flex justify-between items-center mb-1">
 							<label
 								htmlFor="target-percentage"
 								className="text-sm font-semibold text-[var(--clay-muted)] text-brutal mb-0"
@@ -116,6 +124,10 @@ const OverallAtt = memo(function OverallAtt({
 							value={targetPercentage}
 							onChange={(e) => setTargetPercentage(Number(e.target.value))}
 						/>
+						<div className="target-slider__scale">
+							<span>{MIN_TARGET_PERCENTAGE}%</span>
+							<span>{MAX_TARGET_PERCENTAGE}%</span>
+						</div>
 					</div>
 				</div>
 			</div>

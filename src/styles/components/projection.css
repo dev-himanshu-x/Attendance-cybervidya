@@ -135,3 +135,14 @@ thead .projection-table__lunch {
 	max-width: 100%;
 	padding: 0.5rem 0.625rem;
 }
+
+/* .form-control-brutal sets display:block as an unlayered rule, which beats
+   Tailwind's `flex` utility (compiled into a cascade layer) regardless of
+   source order — so the icon + label need their own unlayered override. */
+.planner-date-trigger {
+	display: flex;
+	align-items: center;
+	width: auto;
+	flex: 1 1 auto;
+	min-width: 14rem;
+}

@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Calendar as CalendarIcon, Utensils, X } from "lucide-react";
+import { Calendar as CalendarIcon, Search, Utensils, X } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import { fetchScheduleClasses } from "../../api/schedule";
@@ -545,7 +545,7 @@ export default function Projections({
 							<PopoverTrigger asChild>
 								<button
 									type="button"
-									className="form-control-brutal planner-date-field flex items-center gap-2 text-left w-auto"
+									className="form-control-brutal planner-date-field planner-date-trigger gap-2 text-left"
 								>
 									<CalendarIcon
 										size={16}
@@ -579,6 +579,7 @@ export default function Projections({
 							disabled={isFetchingRange || !rangeStart || !rangeEnd}
 							className="btn-brutal btn-brutal--accent"
 						>
+							<Search size={14} />
 							{isFetchingRange ? "Loading…" : "Show classes"}
 						</button>
 					</div>
