@@ -1,5 +1,6 @@
-import { CalendarClock } from "lucide-react";
-import { useMemo } from "react";
+import { CalendarClock, ChevronLeft, ChevronRight } from "lucide-react";
+import { useMemo, useState } from "react";
+import { getWeekRange } from "../../api/schedule";
 import { formatShortTime, toLectureDateString } from "../../lib/schedule";
 import {
 	type CourseDay,
@@ -11,6 +12,18 @@ import Badge from "../ui/Badge";
 import Button from "../ui/Button";
 import Card from "../ui/Card";
 import Skeleton from "../ui/Skeleton";
+
+function toDateOnly(date: Date): Date {
+	return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function formatDayLabel(date: Date): string {
+	return date.toLocaleDateString("en-US", {
+		weekday: "short",
+		day: "numeric",
+		month: "short",
+	});
+}
 
 interface TodayClassesProps {
 	token: string | null;
@@ -52,36 +65,92 @@ export default function TodayClasses({
 	isProjectionVisible,
 	onToggleProjection,
 }: TodayClassesProps) {
-	const todaysClasses = useMemo(() => {
-		const todayStr = toLectureDateString(new Date());
+	const today = useMemo(() => toDateOnly(new Date()), []);
+	const weekBounds = useMemo(() => getWeekRange(), []);
+	const [selectedDate, setSelectedDate] = useState(today);
+
+	const isToday = selectedDate.getTime() === today.getTime();
+	const canGoPrev = selectedDate.getTime() > weekBounds.startDate.getTime();
+	const canGoNext = selectedDate.getTime() < weekBounds.endDate.getTime();
+
+	const shiftSelectedDate = (days: number) => {
+		setSelectedDate((prev) => {
+			const next = new Date(prev);
+			next.setDate(prev.getDate() + days);
+			return next;
+		});
+	};
+	const goPrevDay = () => canGoPrev && shiftSelectedDate(-1);
+	const goNextDay = () => canGoNext && shiftSelectedDate(1);
+	const goToToday = () => setSelectedDate(today);
+
+	const classesForSelectedDate = useMemo(() => {
+		const dateStr = toLectureDateString(selectedDate);
 		return schedule
 			.filter(
-				(entry) => entry.type === "CLASS" && entry.lectureDate === todayStr,
+				(entry) => entry.type === "CLASS" && entry.lectureDate === dateStr,
 			)
 			.sort((a, b) => a.start.localeCompare(b.start));
-	}, [schedule]);
+	}, [schedule, selectedDate]);
 
-	// Only fetch attendance history for the courses meeting today, not the
-	// student's whole course list — these badges only need today's row.
-	const todaysCourseCodes = useMemo(
-		() => new Set(todaysClasses.map((cls) => cls.courseCode)),
-		[todaysClasses],
+	// Only fetch attendance history for the courses meeting this week, not
+	// the student's whole course list — these badges only need these rows.
+	const weekCourseCodes = useMemo(
+		() =>
+			new Set(
+				schedule
+					.filter((entry) => entry.type === "CLASS")
+					.map((entry) => entry.courseCode),
+			),
+		[schedule],
 	);
 
 	const calendarQuery = useCalendarAttendanceQuery(
 		token,
 		studentId,
 		attendanceData,
-		todaysCourseCodes,
+		weekCourseCodes,
 	);
-	const todayEntries = calendarQuery.data?.[toDateKey(new Date())] ?? [];
+	const selectedDateEntries =
+		calendarQuery.data?.[toDateKey(selectedDate)] ?? [];
 
 	return (
 		<Card className="h-full flex flex-col">
-			<div className="flex items-center justify-between mb-4 gap-2">
-				<h3 className="text-base font-bold text-brutal mb-0">
-					Today's Classes
-				</h3>
+			<div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
+				<div className="flex items-center gap-3 min-w-0">
+					<button
+						type="button"
+						onClick={goPrevDay}
+						disabled={!canGoPrev}
+						className="btn-brutal btn-brutal--outline calendar-view__nav-btn today-classes__nav-btn"
+						aria-label="Previous day"
+					>
+						<ChevronLeft size={16} />
+					</button>
+					<div className="flex flex-col items-center min-w-[8rem]">
+						<h3 className="text-base font-bold text-brutal mb-0 whitespace-nowrap">
+							{isToday ? "Today's Classes" : formatDayLabel(selectedDate)}
+						</h3>
+						{!isToday && (
+							<button
+								type="button"
+								onClick={goToToday}
+								className="calendar-view__today-link"
+							>
+								Jump to today
+							</button>
+						)}
+					</div>
+					<button
+						type="button"
+						onClick={goNextDay}
+						disabled={!canGoNext}
+						className="btn-brutal btn-brutal--outline calendar-view__nav-btn today-classes__nav-btn"
+						aria-label="Next day"
+					>
+						<ChevronRight size={16} />
+					</button>
+				</div>
 				<Button
 					variant="tinted"
 					active={isProjectionVisible}
@@ -96,15 +165,19 @@ export default function TodayClasses({
 					<Skeleton style={{ height: "2.5rem" }} />
 					<Skeleton style={{ height: "2.5rem" }} />
 				</div>
-			) : todaysClasses.length === 0 ? (
+			) : classesForSelectedDate.length === 0 ? (
 				<div className="flex flex-col items-center text-center text-[var(--clay-muted)] py-4 grow justify-center">
 					<CalendarClock size={28} className="mb-2" />
-					<p className="text-sm mb-0">No classes scheduled today.</p>
+					<p className="text-sm mb-0">
+						{isToday
+							? "No classes scheduled today."
+							: "No classes scheduled on this day."}
+					</p>
 				</div>
 			) : (
 				<div className="flex flex-col gap-2">
-					{todaysClasses.map((cls) => {
-						const status = findAttendanceStatus(todayEntries, cls);
+					{classesForSelectedDate.map((cls) => {
+						const status = findAttendanceStatus(selectedDateEntries, cls);
 						return (
 							<div
 								key={`${cls.courseCode}-${cls.start}`}
