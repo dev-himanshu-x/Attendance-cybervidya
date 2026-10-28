@@ -48,3 +48,18 @@
 	background: #e9f2fe;
 	color: #2a5aa8;
 }
+
+:root[data-theme="dark"] .alert-callout--danger {
+	background: rgba(208, 59, 59, 0.16);
+	color: #fca5a5;
+}
+
+:root[data-theme="dark"] .alert-callout--warning {
+	background: rgba(250, 178, 25, 0.16);
+	color: #fcd34d;
+}
+
+:root[data-theme="dark"] .alert-callout--info {
+	background: rgba(59, 130, 246, 0.16);
+	color: #8ab4fd;
+}

@@ -48,7 +48,18 @@ export async function login(
 		const token = direct.data.token || direct.data.data?.token;
 		if (token) return { kind: "token", token };
 	} catch (err) {
-		if (axios.isAxiosError(err) && err.response?.status === 400) throw err;
+		// CyberVidya answers a retired client version with the same 400, so
+		// only treat it as bad credentials when it isn't that message.
+		const reason = getServerErrorReason(err)?.toLowerCase() ?? "";
+		const versionRejected =
+			reason.includes("update your mobile application") ||
+			reason.includes("version is no longer supported");
+		if (
+			axios.isAxiosError(err) &&
+			err.response?.status === 400 &&
+			!versionRejected
+		)
+			throw err;
 	}
 
 	// 2. Fallback: encrypted login, which may return a token or an OTP challenge.

@@ -350,7 +350,7 @@ function AuthErrorBox({
 }: AuthErrorBoxProps) {
 	return (
 		<div
-			className={`relative alert-callout alert-callout--${variant} text-brutal`}
+			className={`relative alert-callout alert-callout--${variant}`}
 			style={{ fontSize: "0.875rem" }}
 		>
 			{isExtensionError && (
