@@ -1,7 +1,10 @@
 import Cookies from "js-cookie";
 
 export const LIVE_URL = "https://kiet.cybervidya.net";
-export const PROXY_URL = "https://proxy.cybervidya.workers.dev";
+// Relative: resolves against this app's own origin, which is backed by the
+// /api/[...path] serverless function that relays to CyberVidya. Keeps the
+// proxy off any shared/blockable third-party IP range (e.g. Cloudflare).
+export const PROXY_URL = "";
 export const API_MODE_COOKIE_NAME = "api_mode"; // "proxy" | "live"
 
 export function getApiMode(): "proxy" | "live" {
