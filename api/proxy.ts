@@ -30,7 +30,14 @@ function buildUpstreamUrl(req: VercelRequest): string {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
 	const targetUrl = buildUpstreamUrl(req);
 
-	const headers: Record<string, string> = {};
+	// Node's bare fetch sends no User-Agent/Accept at all, unlike every real
+	// HTTP client (browsers, axios, mobile apps) — add our own, honestly
+	// labeled, since some WAFs reject header-less requests outright.
+	const headers: Record<string, string> = {
+		"user-agent":
+			"CyberVidyaAttendanceViewer/1.0 (+https://github.com/dev-himanshu-x/Attendance-cybervidya)",
+		accept: "application/json, text/plain, */*",
+	};
 	const contentType = headerValue(req.headers["content-type"]);
 	const authorization = headerValue(req.headers.authorization);
 	if (contentType) headers["content-type"] = contentType;

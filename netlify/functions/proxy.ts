@@ -26,7 +26,14 @@ export const handler: Handler = async (event) => {
 	const query = params.toString();
 	const targetUrl = `${UPSTREAM}/api/${path}${query ? `?${query}` : ""}`;
 
-	const headers: Record<string, string> = {};
+	// Node's bare fetch sends no User-Agent/Accept at all, unlike every real
+	// HTTP client (browsers, axios, mobile apps) — add our own, honestly
+	// labeled, since some WAFs reject header-less requests outright.
+	const headers: Record<string, string> = {
+		"user-agent":
+			"CyberVidyaAttendanceViewer/1.0 (+https://github.com/dev-himanshu-x/Attendance-cybervidya)",
+		accept: "application/json, text/plain, */*",
+	};
 	const contentType = event.headers["content-type"];
 	const authorization = event.headers.authorization;
 	if (contentType) headers["content-type"] = contentType;
