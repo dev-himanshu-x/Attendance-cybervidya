@@ -2,5 +2,10 @@
   command = "bun run build"
   publish = "dist"
 
-# Routing for the edge function is declared inline in
-# netlify/edge-functions/proxy.ts via `export const config = { path: "/api/*" }`.
+# Plain CDN-level passthrough proxy (no custom function/compute involved),
+# as a third, distinct network path to test against CyberVidya's WAF.
+[[redirects]]
+  from = "/api/*"
+  to = "https://kiet.cybervidya.net/api/:splat"
+  status = 200
+  force = true
