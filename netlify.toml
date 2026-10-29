@@ -1,10 +1,6 @@
 [build]
   command = "bun run build"
   publish = "dist"
-  functions = "netlify/functions"
 
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/proxy?path=:splat"
-  status = 200
-  force = true
+# Routing for the edge function is declared inline in
+# netlify/edge-functions/proxy.ts via `export const config = { path: "/api/*" }`.
