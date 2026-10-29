@@ -39,7 +39,7 @@ A fast, installable web dashboard for KIET (Krishna Institute of Engineering and
 
 There is no backend that sees or stores your data — the app is a static frontend plus a stateless relay. Two ways it reaches CyberVidya:
 
-1. **Proxy mode (default)** — requests go to this app's own `/api/*` serverless function (`api/[...path].ts`), which forwards them unmodified to the real ERP (`kiet.cybervidya.net`), since the ERP's API doesn't allow direct cross-origin browser requests. Previously this ran through a Cloudflare Worker (`proxy.cybervidya.workers.dev`); that was retired after CyberVidya blocked Cloudflare's IP range.
+1. **Proxy mode (default)** — a `vercel.json` rewrite sends every `/api/*` request to this app's own serverless function (`api/proxy.ts`), which forwards it unmodified to the real ERP (`kiet.cybervidya.net`), since the ERP's API doesn't allow direct cross-origin browser requests. Previously this ran through a Cloudflare Worker (`proxy.cybervidya.workers.dev`); that was retired after CyberVidya blocked Cloudflare's IP range.
 2. **Live mode (via extension)** — if the *Kiet Auth Bridge* browser extension is installed, it injects a content script into the ERP page to grab your auth token from an active session and rewrites outgoing request headers (via `declarativeNetRequest`) so the browser can call `kiet.cybervidya.net` directly — no proxy in the loop.
 
 Either way, your password is AES-encrypted client-side before it's sent to CyberVidya's own login endpoint, and CyberVidya issues the session token used for every subsequent request.
@@ -59,7 +59,7 @@ Either way, your password is AES-encrypted client-side before it's sent to Cyber
 
 ```
 api/
-└── [...path].ts    # Vercel serverless function: relays /api/* to kiet.cybervidya.net (proxy mode)
+└── proxy.ts        # Vercel serverless function: relays /api/* to kiet.cybervidya.net (proxy mode, routed via vercel.json)
 
 src/
 ├── api/            # axios calls to CyberVidya (auth, attendance, schedule) + base URL/mode config
@@ -122,7 +122,7 @@ The *Kiet Auth Bridge* extension is not required to use the app, but enables liv
 ## Privacy & Disclaimer
 
 - This is a **personal, non-commercial project** — not an official CyberVidya product, and not endorsed by KIET or CyberVidya.
-- No server-side storage: in live mode (extension), credentials go straight from your browser to the official CyberVidya API. In proxy mode, they pass through this project's stateless relay (`api/[...path].ts`) on the way to CyberVidya, but nothing is logged or stored there.
+- No server-side storage: in live mode (extension), credentials go straight from your browser to the official CyberVidya API. In proxy mode, they pass through this project's stateless relay (`api/proxy.ts`) on the way to CyberVidya, but nothing is logged or stored there.
 - Anything persisted locally (session token, saved username/password if "remember me" is checked, target percentage) lives only in your browser's cookies.
 - Full terms are available in-app on the Terms of Service & Privacy Policy page (`src/components/auth/TnC.tsx`).
 
