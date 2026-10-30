@@ -27,8 +27,8 @@ function MaintenancePage() {
 					</h1>
 					<p className="text-sm text-[var(--clay-muted)] mb-0">
 						CyberVidya is blocking requests from this app right now, so
-						attendance data can't load. We're working on a fix — please check
-						back soon.
+						attendance data can't load. We're working on a fix and expect to be
+						back up on Monday.
 					</p>
 				</div>
 			</div>
