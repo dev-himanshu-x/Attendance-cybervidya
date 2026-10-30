@@ -7,6 +7,7 @@ import LoginForm from "./components/auth/LoginForm";
 import TnC from "./components/auth/TnC";
 import ExtensionUpdateNotice from "./components/layout/ExtensionUpdateNotice";
 import Footer from "./components/layout/Footer";
+import MaintenancePage from "./components/layout/MaintenancePage";
 import ThemeToggle from "./components/layout/ThemeToggle";
 import { useAuthToken } from "./hooks/useAuthToken";
 import { useToast } from "./hooks/useToast";
@@ -15,6 +16,10 @@ import {
 	useAttendanceQuery,
 } from "./queries/useAttendanceQuery";
 import { STUDENT_ID_COOKIE_NAME } from "./types/constants";
+
+// CyberVidya is blocking requests from every relay we've tried; flip this
+// back to false once a working path to the ERP is restored.
+const MAINTENANCE_MODE = true;
 
 function App() {
 	const { token, setToken, clearToken } = useAuthToken();
@@ -69,6 +74,19 @@ function App() {
 	// The dashboard carries its own inline theme toggle in its top bar;
 	// everywhere else (login, terms) gets the floating one.
 	const showFloatingToggle = isTnCVisible || !isAuthenticated;
+
+	if (MAINTENANCE_MODE) {
+		return (
+			<div className="app-shell">
+				<ThemeToggle floating />
+				<div className="app-main">
+					<MaintenancePage />
+				</div>
+				<Footer onShowTerms={() => setIsTnCVisible(true)} />
+				<Analytics />
+			</div>
+		);
+	}
 
 	return (
 		<div className="app-shell">
