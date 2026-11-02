@@ -1,0 +1,204 @@
+/* Install guide: a grid of small cards, one per browser. */
+.install-page {
+	max-width: 64rem;
+	margin-inline: auto;
+}
+
+.install-header {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
+
+/* The shared back button carries its own bottom margin for long pages. */
+.install-header .docs-page__back {
+	margin-bottom: 0;
+	height: 2.25rem;
+	padding: 0 1rem;
+}
+
+.install-title {
+	margin: 0;
+	font-size: 1.5rem;
+	font-weight: 800;
+	line-height: 1.2;
+}
+
+.install-subtitle {
+	margin: 0.125rem 0 0;
+	font-size: 0.875rem;
+	color: var(--clay-muted);
+}
+
+.install-why {
+	margin-bottom: 1rem;
+	padding: 0.75rem 1rem;
+	border: 1px solid var(--clay-raised-border);
+	border-radius: var(--clay-radius-md);
+	background: var(--clay-surface);
+	font-size: 0.875rem;
+	line-height: 1.5;
+	color: var(--clay-muted);
+}
+
+.install-why strong {
+	color: var(--clay-text);
+}
+
+/* Three small tiles: download, install, reload. */
+.install-flow {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 0.75rem;
+	margin: 0 0 1rem;
+	padding: 0;
+	list-style: none;
+}
+
+@media (max-width: 640px) {
+	.install-flow {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+.install-flow__item {
+	display: flex;
+	align-items: center;
+	gap: 0.625rem;
+	padding: 0.625rem 0.75rem;
+	border: 1px solid var(--clay-raised-border);
+	border-radius: var(--clay-radius-md);
+	background: var(--clay-surface-alt);
+}
+
+.install-flow__number {
+	display: grid;
+	place-items: center;
+	flex-shrink: 0;
+	width: 1.75rem;
+	height: 1.75rem;
+	border-radius: 50%;
+	background: var(--clay-accent);
+	color: #fff;
+	font-size: 0.8125rem;
+	font-weight: 800;
+}
+
+.install-flow__title,
+.install-flow__text {
+	margin: 0;
+	line-height: 1.3;
+}
+
+.install-flow__title {
+	font-size: 0.875rem;
+	font-weight: 800;
+}
+
+.install-flow__text {
+	font-size: 0.75rem;
+	color: var(--clay-muted);
+}
+
+.install-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 1rem;
+}
+
+@media (min-width: 768px) {
+	.install-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+.install-card {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	padding: 1rem;
+	border: 1px solid var(--clay-raised-border);
+	border-radius: var(--clay-radius-md);
+	background: var(--clay-surface-alt);
+}
+
+.install-card__head {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.install-card__title {
+	margin: 0;
+	font-size: 1rem;
+	font-weight: 800;
+	line-height: 1.25;
+}
+
+.install-card__intro {
+	margin: -0.25rem 0 0;
+	font-size: 0.8125rem;
+	color: var(--clay-muted);
+}
+
+.install-card__action {
+	padding-block: 0.5rem;
+	font-size: 0.875rem;
+	text-decoration: none;
+}
+
+.install-steps {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	counter-reset: step;
+	font-size: 0.8125rem;
+	line-height: 1.45;
+	color: var(--clay-muted);
+}
+
+.install-steps li {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.625rem;
+	counter-increment: step;
+}
+
+.install-steps li::before {
+	content: counter(step);
+	display: grid;
+	place-items: center;
+	flex-shrink: 0;
+	width: 1.375rem;
+	height: 1.375rem;
+	border-radius: 50%;
+	background: var(--clay-tinted-bg);
+	color: var(--clay-tinted-text);
+	font-size: 0.75rem;
+	font-weight: 800;
+}
+
+.install-steps strong {
+	color: var(--clay-text);
+}
+
+.install-steps code,
+.install-note code {
+	font-size: 0.75rem;
+	overflow-wrap: anywhere;
+}
+
+.install-note {
+	margin-top: auto;
+	padding: 0.5rem 0.75rem;
+	border-radius: var(--clay-radius-sm);
+	background: var(--clay-surface);
+	font-size: 0.75rem;
+	line-height: 1.45;
+	color: var(--clay-muted);
+}

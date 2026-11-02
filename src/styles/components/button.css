@@ -114,22 +114,3 @@
 		display: none;
 	}
 }
-
-/* Profile action-row gap — matches the app's bespoke (non-standard) breakpoints */
-@media (max-width: 330px) {
-	.gap-responsive {
-		gap: 0.125rem;
-	}
-}
-
-@media (min-width: 347px) {
-	.gap-responsive {
-		gap: 0.5rem;
-	}
-}
-
-@media (min-width: 640px) {
-	.gap-responsive {
-		gap: 1rem;
-	}
-}

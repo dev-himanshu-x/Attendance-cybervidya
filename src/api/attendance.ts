@@ -4,7 +4,7 @@ import type {
 	StudentAttendanceApiResponse,
 	StudentDetails,
 } from "../types/response";
-import { authHeaders } from "./client";
+import { authHeaders, getBaseUrl } from "./client";
 
 // Without a timeout, a stalled response from the ERP hangs the request
 // forever — fatal for fetchCourseAttendance, which a sequential loop awaits
@@ -16,7 +16,7 @@ export async function fetchAttendanceData(
 ): Promise<StudentDetails> {
 	try {
 		const attendanceResponse = await axios.get<StudentAttendanceApiResponse>(
-			"/api/attendance/course/component/student",
+			`${getBaseUrl()}/api/attendance/course/component/student`,
 			{ headers: authHeaders(token), timeout: REQUEST_TIMEOUT_MS },
 		);
 		return attendanceResponse.data.data;
@@ -36,7 +36,7 @@ export async function fetchAttendanceData(
 
 export async function fetchStudentId(token: string): Promise<number | null> {
 	const response = await axios.get(
-		"/api/student/dashboard/registered-courses",
+		`${getBaseUrl()}/api/student/dashboard/registered-courses`,
 		{ headers: authHeaders(token), timeout: REQUEST_TIMEOUT_MS },
 	);
 
@@ -56,7 +56,7 @@ export async function fetchCourseAttendance(
 	},
 ) {
 	const response = await axios.post<AttendanceApiResponse>(
-		"/api/attendance/schedule/student/course/attendance/percentage",
+		`${getBaseUrl()}/api/attendance/schedule/student/course/attendance/percentage`,
 		payload,
 		{
 			headers: {

@@ -43,12 +43,6 @@
 	display: flex;
 }
 
-.form-control-brutal.is-invalid {
-	border-color: color-mix(in srgb, var(--clay-danger) 50%, transparent);
-	outline: 3px solid color-mix(in srgb, var(--clay-danger) 30%, transparent);
-	outline-offset: 1px;
-}
-
 .form-label-brutal {
 	font-family: var(--font-sans);
 	letter-spacing: 0.01em;

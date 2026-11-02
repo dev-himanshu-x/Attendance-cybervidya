@@ -11,14 +11,14 @@
 @import "../styles/components/alert.css";
 @import "../styles/components/table.css";
 @import "../styles/components/toast.css";
-@import "../styles/components/avatar.css";
 @import "../styles/components/toggle-switch.css";
 @import "../styles/components/form.css";
-@import "../styles/components/progress.css";
 @import "../styles/components/auth.css";
 @import "../styles/components/meter.css";
 @import "../styles/components/projection.css";
 @import "../styles/components/calendar.css";
+@import "../styles/components/notice.css";
+@import "../styles/components/install.css";
 @import "tw-animate-css";
 
 /* This app's dark theme is toggled via [data-theme="dark"] on <html>

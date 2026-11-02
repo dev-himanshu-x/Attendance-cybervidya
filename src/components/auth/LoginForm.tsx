@@ -1,22 +1,29 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { ArrowRight, ShieldCheck } from "lucide-react";
+import { ArrowRight, ArrowUpRight, ShieldCheck } from "lucide-react";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { getServerErrorReason } from "../../api/auth";
 import { useAuthToken } from "../../hooks/useAuthToken";
+import { isFirefoxFamily } from "../../hooks/useExtensionStatus";
 import { useToast } from "../../hooks/useToast";
 import { useLoginMutation } from "../../queries/useLoginMutation";
 import { useVerifyOtpMutation } from "../../queries/useVerifyOtpMutation";
 import {
 	COOKIE_EXPIRY,
+	EXTENSION_DOWNLOAD_CHROME,
+	EXTENSION_DOWNLOAD_FIREFOX,
+	getApiMode,
 	PASSWORD_COOKIE_NAME,
 	REMEMBER_ME_COOKIE_NAME,
+	REQUIRED_EXTENSION_VERSION,
 	STUDENT_ID_COOKIE_NAME,
 	USERNAME_COOKIE_NAME,
 } from "../../types/constants";
+import InstallExtensionPage from "../docs/InstallExtensionPage";
+import ExtensionRequiredNotice from "../layout/ExtensionRequiredNotice";
 import Button from "../ui/Button";
 import PasswordInput from "../ui/PasswordInput";
 
@@ -47,6 +54,9 @@ function LoginForm() {
 
 	const [step, setStep] = useState<"credentials" | "otp">("credentials");
 	const [transactionId, setTransactionId] = useState<string>("");
+	const apiMode = getApiMode();
+	const [isExtensionError, setIsExtensionError] = useState<boolean>(false);
+	const [showInstallPage, setShowInstallPage] = useState<boolean>(false);
 
 	const submittedRef = useRef({
 		username: "",
@@ -80,14 +90,31 @@ function LoginForm() {
 		if (axios.isAxiosError(err) && err.response?.status === 400) {
 			form.setError("root", { message: serverReason || invalidMessage });
 		} else if (axios.isAxiosError(err) && err.response?.status === 403) {
-			form.setError("root", {
-				message:
-					serverReason ||
-					"Access forbidden. Please check your credentials or try again.",
-			});
+			// Two different 403s: the site could not find the extension, or
+			// CyberVidya's firewall refused the request the extension made.
+			const extensionMissing = !!serverReason?.includes(
+				"Attendance Bridge extension",
+			);
+			if (apiMode === "live" && extensionMissing) {
+				form.setError("root", {
+					message: `${serverReason} Install or update the extension (version ${REQUIRED_EXTENSION_VERSION}), then reload this page.`,
+				});
+				setIsExtensionError(true);
+			} else {
+				form.setError("root", {
+					message:
+						serverReason ||
+						"CyberVidya's firewall refused the request (403). Reload this page and try again; if it keeps happening, check that the extension is up to date.",
+				});
+				setIsExtensionError(false);
+			}
 		} else {
+			// A failure inside the extension names its cause; anything else is a
+			// connection problem.
 			toast.error(
-				"The server isn’t responding or your internet connection may be unavailable. Please try again.",
+				axios.isAxiosError(err) && err.message.startsWith("Attendance Bridge:")
+					? err.message
+					: "The server isn’t responding or your internet connection may be unavailable. Please try again.",
 			);
 		}
 	}
@@ -119,6 +146,7 @@ function LoginForm() {
 
 	const onCredentialsSubmit = credentialsForm.handleSubmit(async (values) => {
 		credentialsForm.clearErrors("root");
+		setIsExtensionError(false);
 
 		try {
 			const result = await loginMutation.mutateAsync({
@@ -148,6 +176,7 @@ function LoginForm() {
 
 	const onOtpSubmit = otpForm.handleSubmit(async (values) => {
 		otpForm.clearErrors("root");
+		setIsExtensionError(false);
 
 		let token = "";
 		try {
@@ -167,11 +196,15 @@ function LoginForm() {
 		completeLogin(token, submittedRef.current);
 	});
 
+	if (showInstallPage) {
+		return <InstallExtensionPage onBack={() => setShowInstallPage(false)} />;
+	}
+
 	const isLoading =
 		step === "credentials" ? loginMutation.isPending : otpMutation.isPending;
 
 	return (
-		<div className="flex flex-col my-12 items-center justify-center p-6">
+		<div className="login-page flex flex-col items-center justify-center">
 			<div className="auth-card w-full fade-in" style={{ maxWidth: "28rem" }}>
 				<div className="auth-card__body">
 					<div className="auth-logo text-center mb-6">
@@ -239,6 +272,8 @@ function LoginForm() {
 							{credentialsForm.formState.errors.root && (
 								<AuthErrorBox
 									message={credentialsForm.formState.errors.root.message ?? ""}
+									isExtensionError={isExtensionError}
+									onViewGuide={() => setShowInstallPage(true)}
 									variant="warning"
 								/>
 							)}
@@ -274,6 +309,8 @@ function LoginForm() {
 							{otpForm.formState.errors.root && (
 								<AuthErrorBox
 									message={otpForm.formState.errors.root.message ?? ""}
+									isExtensionError={isExtensionError}
+									onViewGuide={() => setShowInstallPage(true)}
 									variant="danger"
 								/>
 							)}
@@ -287,6 +324,7 @@ function LoginForm() {
 								onClick={() => {
 									setStep("credentials");
 									otpForm.clearErrors("root");
+									setIsExtensionError(false);
 								}}
 								className="btn-brutal btn-brutal--plain w-full text-center"
 							>
@@ -296,33 +334,87 @@ function LoginForm() {
 					)}
 				</div>
 
-				<div className="auth-card__footer">
-					Your data stays in your browser.{" "}
-					<a href={SOURCE_CODE_URL} target="_blank" rel="noopener noreferrer">
-						View source
-					</a>
+				<div className="auth-card__footer auth-card__footer--icon">
+					<span className="auth-card__icon-circle" aria-hidden="true">
+						<ArrowUpRight size={12} />
+					</span>
+					<span>
+						Your data stays in your browser.{" "}
+						<a href={SOURCE_CODE_URL} target="_blank" rel="noopener noreferrer">
+							View source
+						</a>
+					</span>
+				</div>
+				<div className="auth-card__footer auth-card__footer--icon">
+					<span className="auth-card__icon-circle" aria-hidden="true">
+						<ArrowUpRight size={12} />
+					</span>
+					<span>
+						<button
+							type="button"
+							className="auth-card__link"
+							onClick={() => setShowInstallPage(true)}
+						>
+							This site needs the Attendance Bridge extension.
+						</button>{" "}
+						<a
+							href={
+								isFirefoxFamily()
+									? EXTENSION_DOWNLOAD_FIREFOX
+									: EXTENSION_DOWNLOAD_CHROME
+							}
+							download
+						>
+							Download
+						</a>
+					</span>
 				</div>
 				<div className="auth-card__footer auth-card__footer--notice">
 					<ShieldCheck size={14} />
 					Not affiliated with KIET or CyberVidya
 				</div>
 			</div>
+			<ExtensionRequiredNotice onShowGuide={() => setShowInstallPage(true)} />
 		</div>
 	);
 }
 
 interface AuthErrorBoxProps {
 	message: string;
+	isExtensionError: boolean;
+	onViewGuide: () => void;
 	variant: "warning" | "danger";
 }
 
-function AuthErrorBox({ message, variant }: AuthErrorBoxProps) {
+function AuthErrorBox({
+	message,
+	isExtensionError,
+	onViewGuide,
+	variant,
+}: AuthErrorBoxProps) {
 	return (
 		<div
-			className={`alert-callout alert-callout--${variant}`}
+			className={`relative alert-callout alert-callout--${variant}`}
 			style={{ fontSize: "0.875rem" }}
 		>
+			{isExtensionError && (
+				<span
+					className="badge-attendance badge-attendance--absent badge-attendance--sm absolute rounded-full"
+					style={{ top: "-0.75rem", right: "-0.75rem" }}
+				>
+					New
+				</span>
+			)}
 			<p className="mb-0">{message}</p>
+			{isExtensionError && (
+				<button
+					type="button"
+					onClick={onViewGuide}
+					className="btn-brutal btn-brutal--plain mt-2"
+				>
+					View extension installation guide →
+				</button>
+			)}
 		</div>
 	);
 }

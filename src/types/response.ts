@@ -61,16 +61,6 @@ export interface AttendanceComponentInfo {
 
 // ---------------- DAYWISE-ATTENDANCE-API-RESPONSE ----------------
 
-export interface DaywiseReportProps {
-	token: string;
-	payload: {
-		courseCompId: number;
-		courseId: number;
-		sessionId: number | null;
-		studentId: number | string;
-	};
-}
-
 export interface LectureListProps {
 	planLecDate: string;
 	dayName: string;

@@ -1,32 +1,56 @@
 # CyberVidya Attendance Viewer
 
-A fast, installable web dashboard for KIET students to check **CyberVidya** attendance without fighting the official ERP UI — overall and per-course percentages, a calendar view, today's/weekly schedule, and "what if I skip class" projections.
+A fast web dashboard for KIET students to check **CyberVidya** attendance without fighting the official ERP UI — overall and per-course percentages, a calendar view, today's and weekly schedule, and "what if I skip class" projections.
 
-> **Personal project, not affiliated with CyberVidya or KIET.** Credentials go to the official CyberVidya API — through this project's stateless relay — and are never logged or stored. See [Privacy & Disclaimer](#privacy--disclaimer).
+> **Personal project, not affiliated with CyberVidya or KIET.** Your credentials go from your browser to the official CyberVidya API and are never logged or stored by this project. See [Privacy & Disclaimer](#privacy--disclaimer).
 
 ## Features
 
-- **Login** — username/password + OTP, "remember me".
+- **Login** — roll number and password, plus OTP when CyberVidya asks for one; optional "remember me".
 - **Dashboard** — profile header, overall attendance ring, adjustable target %, miss/attend projections.
 - **Courses** — card and calendar views, per-lecture daywise history, search.
 - **Planning** — today's classes, and a weekly "what-if" planner to simulate skipping upcoming classes.
-- PWA-installable, responsive, dark mode, toasts + skeleton loading states.
+- Responsive, dark mode, toasts and skeleton loading states.
 
-## How it works
+## The browser extension (required)
 
-No backend sees or stores your data — just a static frontend plus a stateless relay. Every `/api/*` call is served by this app's own route handler (`src/app/api/[...path]/route.ts`), which forwards requests unmodified to `kiet.cybervidya.net` (the ERP blocks direct cross-origin browser requests).
+**The website does not work without the *Attendance Bridge* browser extension.** CyberVidya's firewall refuses API requests that don't come from its own pages (including anything from a server or relay), so the extension makes them for the site. It runs each request inside a real CyberVidya page. In **Chrome, Edge, Brave, Firefox and Zen** that page lives in a hidden frame held by the extension itself, so no CyberVidya window or tab is ever shown. In **Safari**, which can't hold one, it reuses a CyberVidya tab you already have open, or quietly opens one in a minimised window that closes itself about two minutes after last use. It uses your own session and your own browser; nothing is forged and nothing goes through any server of ours.
 
-Your password is AES-encrypted client-side before it ever reaches CyberVidya's login endpoint.
+The login card always carries a *Download* link for the extension. If your browser doesn't have the extension, the login page also shows a popup in the bottom corner (with *Download* and *How to install* buttons) until you install it; with the extension installed, the popup stays hidden.
+
+**Desktop browsers only** — phone browsers can't run extensions.
+
+### Get it
+
+- **From the site** — the login page's popup, or the install guide, links to the download. The files are built from `extension/attendance-bridge/` by `bun run pack:extension` (it runs automatically before `dev` and `build`) and served at:
+  - `/downloads/attendance-bridge-chrome.zip` — Chrome, Edge, Brave
+  - `/downloads/attendance-bridge-firefox.xpi` — Firefox, Zen
+- **From the source** — load the folder directly (below).
+
+### Install it
+
+| Browser | Steps |
+| --- | --- |
+| **Chrome / Edge / Brave** | Unzip the download. Open `chrome://extensions` (`edge://extensions`, `brave://extensions`), turn on **Developer mode**, click **Load unpacked** and choose the unzipped folder (or `extension/attendance-bridge/chrome` from the source). Reload the site. |
+| **Firefox / Zen** | Open `about:debugging#/runtime/this-firefox`, click **Load Temporary Add-on…** and choose `manifest.json` from the unzipped `firefox` folder. It is removed when the browser restarts; a permanent install needs a signed add-on. |
+| **Safari (Mac)** | Open `extension/safari/Attendance Bridge/Attendance Bridge.xcodeproj` in Xcode and run the `Attendance Bridge (macOS)` scheme. In Safari, enable *Develop → Allow Unsigned Extensions*, then turn the extension on under *Settings → Extensions*. Safari support is untested. |
+
+After installing or updating, reload the site. If the extension is too old for the site, the login page says which version it found and which it needs (currently 4.6).
 
 ## Tech stack
 
-Next.js 16 (App Router) + React 19 + TypeScript, TanStack Query, React Hook Form + Zod, Sass, axios, Biome, Bun.
+Next.js 16 (App Router) + React 19 + TypeScript, TanStack Query, React Hook Form + Zod, Tailwind CSS 4 with plain CSS components, axios, Biome, Bun.
 
 ## Project structure
 
 ```
-src/app/    # Next.js App Router: layout, page, and the /api relay route handler
-src/        # app code (api/, components/, hooks/, lib/, queries/, styles/, types/)
+src/                 # website: app/, api/, components/, hooks/, lib/, queries/, styles/, types/
+extension/
+  attendance-bridge/ # the browser extension (chrome/, firefox/)
+  safari/            # Xcode project that wraps the Chrome build for Safari
+mobile/              # React Native (Expo) app
+scripts/             # pack-extension.mjs builds the extension downloads
+public/downloads/    # generated by the script above (not committed)
 ```
 
 ## Getting started
@@ -37,18 +61,25 @@ Requires [Bun](https://bun.sh).
 git clone git@github.com:dev-himanshu-x/Attendance-cybervidya.git
 cd Attendance-cybervidya
 bun install
-bun run dev        # dev server
-bun run build      # production build (type-checks too)
-bun run start      # serve the production build
-bun run typecheck  # type-check only
-bun run lint     # lint and format
+bun run dev            # dev server (packs the extension downloads first)
+bun run build          # production build (packs, then type-checks)
+bun run start          # serve the production build
+bun run typecheck      # type-check only
+bun run lint           # lint and format
+bun run pack:extension # rebuild public/downloads/ by hand
 ```
+
+To try the site you need the extension loaded in your browser (see above). A deployed site shows an "Under maintenance" page unless `NEXT_PUBLIC_MAINTENANCE_MODE=false` is set (for local use, put it in `.env.local`).
+
+## Mobile app
+
+`mobile/` is a React Native (Expo) app with the same features. It needs no extension: you sign in on CyberVidya's own page inside the app, and the app makes its requests from a hidden browser view of that page. See `mobile/` and run it with `cd mobile && bun install && bun run ios`.
 
 ## Privacy & Disclaimer
 
 - Personal, non-commercial project — not an official CyberVidya product, not endorsed by KIET or CyberVidya.
-- No server-side storage: credentials pass through this project's stateless relay to CyberVidya, but nothing is logged or stored.
-- Anything persisted locally (session token, saved credentials, target %) lives only in your browser's cookies.
+- No server-side storage: requests go from your browser (through the extension) straight to CyberVidya, and nothing is logged or stored by this project.
+- Anything kept locally lives in your browser: your session token, your roll number, and your password if you tick "remember me" (in cookies), and the theme.
 - Full terms: in-app Terms of Service & Privacy Policy page.
 
 ## License
