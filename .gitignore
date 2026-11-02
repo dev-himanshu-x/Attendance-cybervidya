@@ -30,6 +30,9 @@ bun-debug.log*
 *.sln
 *.sw?
 
+# Generated extension downloads (scripts/pack-extension.mjs)
+public/downloads/
+
 # Env
 .env
 .env.local
@@ -37,3 +40,7 @@ bun-debug.log*
 
 # Browser-generated when loading unpacked extensions
 extension/*/_metadata/
+extension/attendance-bridge/*/_metadata/
+
+# Local assistant settings
+mobile/.claude/

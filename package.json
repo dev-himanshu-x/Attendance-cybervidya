@@ -6,12 +6,15 @@
 		"*.{js,jsx,ts,tsx,json,jsonc}": "biome check --write"
 	},
 	"scripts": {
+		"predev": "node scripts/pack-extension.mjs",
 		"dev": "next dev",
+		"prebuild": "node scripts/pack-extension.mjs",
 		"build": "next build",
 		"lint": "bunx biome check --write .",
 		"start": "next start",
 		"typecheck": "tsc --noEmit",
-		"prepare": "husky"
+		"prepare": "husky",
+		"pack:extension": "node scripts/pack-extension.mjs"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^5.9.1",
@@ -42,9 +45,9 @@
 		"@types/node": "^26.6.5",
 		"@types/react": "^19.2.2",
 		"@types/react-dom": "^19.2.2",
+		"fflate": "^0.8.3",
 		"husky": "^9.1.7",
 		"lint-staged": "^16.2.6",
-		"shadcn": "^4.22.1",
 		"typescript": "~5.8.3"
 	}
 }
