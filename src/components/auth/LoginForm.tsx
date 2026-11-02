@@ -12,13 +12,11 @@ import { useLoginMutation } from "../../queries/useLoginMutation";
 import { useVerifyOtpMutation } from "../../queries/useVerifyOtpMutation";
 import {
 	COOKIE_EXPIRY,
-	getApiMode,
 	PASSWORD_COOKIE_NAME,
 	REMEMBER_ME_COOKIE_NAME,
 	STUDENT_ID_COOKIE_NAME,
 	USERNAME_COOKIE_NAME,
 } from "../../types/constants";
-import InstallExtensionPage from "../docs/InstallExtensionPage";
 import Button from "../ui/Button";
 import PasswordInput from "../ui/PasswordInput";
 
@@ -49,9 +47,6 @@ function LoginForm() {
 
 	const [step, setStep] = useState<"credentials" | "otp">("credentials");
 	const [transactionId, setTransactionId] = useState<string>("");
-	const apiMode = getApiMode();
-	const [isExtensionError, setIsExtensionError] = useState<boolean>(false);
-	const [showInstallPage, setShowInstallPage] = useState<boolean>(false);
 
 	const submittedRef = useRef({
 		username: "",
@@ -85,19 +80,11 @@ function LoginForm() {
 		if (axios.isAxiosError(err) && err.response?.status === 400) {
 			form.setError("root", { message: serverReason || invalidMessage });
 		} else if (axios.isAxiosError(err) && err.response?.status === 403) {
-			if (apiMode === "live") {
-				form.setError("root", {
-					message: "Please Update the Extension to the latest version 3.6!",
-				});
-				setIsExtensionError(true);
-			} else {
-				form.setError("root", {
-					message:
-						serverReason ||
-						"Access forbidden. Please check your credentials or try again.",
-				});
-				setIsExtensionError(false);
-			}
+			form.setError("root", {
+				message:
+					serverReason ||
+					"Access forbidden. Please check your credentials or try again.",
+			});
 		} else {
 			toast.error(
 				"The server isn’t responding or your internet connection may be unavailable. Please try again.",
@@ -132,7 +119,6 @@ function LoginForm() {
 
 	const onCredentialsSubmit = credentialsForm.handleSubmit(async (values) => {
 		credentialsForm.clearErrors("root");
-		setIsExtensionError(false);
 
 		try {
 			const result = await loginMutation.mutateAsync({
@@ -162,7 +148,6 @@ function LoginForm() {
 
 	const onOtpSubmit = otpForm.handleSubmit(async (values) => {
 		otpForm.clearErrors("root");
-		setIsExtensionError(false);
 
 		let token = "";
 		try {
@@ -181,10 +166,6 @@ function LoginForm() {
 
 		completeLogin(token, submittedRef.current);
 	});
-
-	if (showInstallPage) {
-		return <InstallExtensionPage onBack={() => setShowInstallPage(false)} />;
-	}
 
 	const isLoading =
 		step === "credentials" ? loginMutation.isPending : otpMutation.isPending;
@@ -258,8 +239,6 @@ function LoginForm() {
 							{credentialsForm.formState.errors.root && (
 								<AuthErrorBox
 									message={credentialsForm.formState.errors.root.message ?? ""}
-									isExtensionError={isExtensionError}
-									onViewGuide={() => setShowInstallPage(true)}
 									variant="warning"
 								/>
 							)}
@@ -295,8 +274,6 @@ function LoginForm() {
 							{otpForm.formState.errors.root && (
 								<AuthErrorBox
 									message={otpForm.formState.errors.root.message ?? ""}
-									isExtensionError={isExtensionError}
-									onViewGuide={() => setShowInstallPage(true)}
 									variant="danger"
 								/>
 							)}
@@ -310,7 +287,6 @@ function LoginForm() {
 								onClick={() => {
 									setStep("credentials");
 									otpForm.clearErrors("root");
-									setIsExtensionError(false);
 								}}
 								className="btn-brutal btn-brutal--plain w-full text-center"
 							>
@@ -337,40 +313,16 @@ function LoginForm() {
 
 interface AuthErrorBoxProps {
 	message: string;
-	isExtensionError: boolean;
-	onViewGuide: () => void;
 	variant: "warning" | "danger";
 }
 
-function AuthErrorBox({
-	message,
-	isExtensionError,
-	onViewGuide,
-	variant,
-}: AuthErrorBoxProps) {
+function AuthErrorBox({ message, variant }: AuthErrorBoxProps) {
 	return (
 		<div
-			className={`relative alert-callout alert-callout--${variant}`}
+			className={`alert-callout alert-callout--${variant}`}
 			style={{ fontSize: "0.875rem" }}
 		>
-			{isExtensionError && (
-				<span
-					className="badge-attendance badge-attendance--absent badge-attendance--sm absolute rounded-full"
-					style={{ top: "-0.75rem", right: "-0.75rem" }}
-				>
-					New
-				</span>
-			)}
 			<p className="mb-0">{message}</p>
-			{isExtensionError && (
-				<button
-					type="button"
-					onClick={onViewGuide}
-					className="btn-brutal btn-brutal--plain mt-2"
-				>
-					View extension installation guide →
-				</button>
-			)}
 		</div>
 	);
 }

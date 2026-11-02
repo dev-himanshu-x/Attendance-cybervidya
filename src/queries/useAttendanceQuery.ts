@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchAttendanceData } from "../api/attendance";
-import { getApiMode } from "../api/client";
 import type { StudentDetails } from "../types/response";
 
 function withoutProjections(data: StudentDetails): StudentDetails {
@@ -19,7 +18,7 @@ function withoutProjections(data: StudentDetails): StudentDetails {
 }
 
 export function attendanceQueryKey(token: string | null) {
-	return ["attendance", token, getApiMode()] as const;
+	return ["attendance", token] as const;
 }
 
 export function useAttendanceQuery(token: string | null) {

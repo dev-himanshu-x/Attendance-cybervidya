@@ -1,7 +1,6 @@
 import axios from "axios";
 import CryptoJS from "crypto-js";
 import type { EncryptLoginResponse, LoginResponse } from "../types/response";
-import { getBaseUrl } from "./client";
 
 export function encryptPassword(plaintext: string): string {
 	const key = CryptoJS.enc.Base64.parse("NPdLWA5w7yFQhPeUuKmO/A==");
@@ -41,10 +40,10 @@ export async function login(
 	// 1. Direct login (bypasses OTP). If CyberVidya explicitly rejects the
 	// credentials (400), propagate instead of retrying.
 	try {
-		const direct = await axios.post<LoginResponse>(
-			`${getBaseUrl()}/api/auth/login`,
-			{ userName: username, password },
-		);
+		const direct = await axios.post<LoginResponse>("/api/auth/login", {
+			userName: username,
+			password,
+		});
 		const token = direct.data.token || direct.data.data?.token;
 		if (token) return { kind: "token", token };
 	} catch (err) {
@@ -64,7 +63,7 @@ export async function login(
 
 	// 2. Fallback: encrypted login, which may return a token or an OTP challenge.
 	const response = await axios.post<EncryptLoginResponse>(
-		`${getBaseUrl()}/api/auth/encrypt/login`,
+		"/api/auth/encrypt/login",
 		{
 			userName: encryptPassword(username),
 			password: encryptPassword(password),
@@ -92,15 +91,12 @@ export async function login(
 }
 
 export async function verifyOtp(otp: string, transactionId: string) {
-	const response = await axios.post<LoginResponse>(
-		`${getBaseUrl()}/api/auth/verify/otp`,
-		{
-			otp,
-			transactionId,
-			device: "WEB",
-			version: null,
-		},
-	);
+	const response = await axios.post<LoginResponse>("/api/auth/verify/otp", {
+		otp,
+		transactionId,
+		device: "WEB",
+		version: null,
+	});
 	const token = response.data.token || response.data.data?.token;
 	if (!token) {
 		throw new Error(

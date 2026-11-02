@@ -2,8 +2,11 @@
 node_modules
 
 # Build output
+.next
+out
 dist
-dist-ssr
+next-env.d.ts
+*.tsbuildinfo
 *.local
 
 # Logs

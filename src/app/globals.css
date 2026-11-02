@@ -1,24 +1,24 @@
 @import "tailwindcss";
 
-@import "./tokens.css";
-@import "./animations.css";
-@import "./docs-page.css";
-@import "./components/card.css";
-@import "./components/button.css";
-@import "./components/badge.css";
-@import "./components/modal.css";
-@import "./components/skeleton.css";
-@import "./components/alert.css";
-@import "./components/table.css";
-@import "./components/toast.css";
-@import "./components/avatar.css";
-@import "./components/toggle-switch.css";
-@import "./components/form.css";
-@import "./components/progress.css";
-@import "./components/auth.css";
-@import "./components/meter.css";
-@import "./components/projection.css";
-@import "./components/calendar.css";
+@import "../styles/tokens.css";
+@import "../styles/animations.css";
+@import "../styles/docs-page.css";
+@import "../styles/components/card.css";
+@import "../styles/components/button.css";
+@import "../styles/components/badge.css";
+@import "../styles/components/modal.css";
+@import "../styles/components/skeleton.css";
+@import "../styles/components/alert.css";
+@import "../styles/components/table.css";
+@import "../styles/components/toast.css";
+@import "../styles/components/avatar.css";
+@import "../styles/components/toggle-switch.css";
+@import "../styles/components/form.css";
+@import "../styles/components/progress.css";
+@import "../styles/components/auth.css";
+@import "../styles/components/meter.css";
+@import "../styles/components/projection.css";
+@import "../styles/components/calendar.css";
 @import "tw-animate-css";
 
 /* This app's dark theme is toggled via [data-theme="dark"] on <html>

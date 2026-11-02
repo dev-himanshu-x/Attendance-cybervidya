@@ -1,6 +1,6 @@
 import axios from "axios";
 import type { ScheduleEntry, ScheduleResponse } from "../types/response";
-import { authHeaders, getBaseUrl } from "./client";
+import { authHeaders } from "./client";
 
 function formatDate(date: Date): string {
 	return date.toISOString().split("T")[0];
@@ -23,7 +23,7 @@ export async function fetchScheduleClasses(
 	end: Date,
 ): Promise<ScheduleEntry[]> {
 	const response = await axios.get<ScheduleResponse>(
-		`${getBaseUrl()}/api/student/schedule/class`,
+		"/api/student/schedule/class",
 		{
 			params: {
 				weekStartDate: formatDate(start),

@@ -1,34 +1,34 @@
+"use client";
+
 import { useQueryClient } from "@tanstack/react-query";
-import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from "@vercel/analytics/next";
 import Cookies from "js-cookie";
-import { useCallback, useEffect, useRef, useState } from "react";
-import Attendance from "./components/attendance/Attendance";
-import LoginForm from "./components/auth/LoginForm";
-import TnC from "./components/auth/TnC";
-import ExtensionUpdateNotice from "./components/layout/ExtensionUpdateNotice";
-import Footer from "./components/layout/Footer";
-import MaintenancePage from "./components/layout/MaintenancePage";
-import ThemeToggle from "./components/layout/ThemeToggle";
-import { useAuthToken } from "./hooks/useAuthToken";
-import { useToast } from "./hooks/useToast";
+import { useCallback, useEffect, useState } from "react";
+import Attendance from "@/components/attendance/Attendance";
+import LoginForm from "@/components/auth/LoginForm";
+import TnC from "@/components/auth/TnC";
+import Footer from "@/components/layout/Footer";
+import MaintenancePage from "@/components/layout/MaintenancePage";
+import ThemeToggle from "@/components/layout/ThemeToggle";
+import { useAuthToken } from "@/hooks/useAuthToken";
+import { useToast } from "@/hooks/useToast";
 import {
 	attendanceQueryKey,
 	useAttendanceQuery,
-} from "./queries/useAttendanceQuery";
-import { STUDENT_ID_COOKIE_NAME } from "./types/constants";
+} from "@/queries/useAttendanceQuery";
+import { STUDENT_ID_COOKIE_NAME } from "@/types/constants";
 
 // CyberVidya is blocking requests from every relay we've tried; flip this
 // back to false once a working path to the ERP is restored.
 const MAINTENANCE_MODE = true;
 
 function App() {
-	const { token, setToken, clearToken } = useAuthToken();
+	const { token, clearToken } = useAuthToken();
 	const queryClient = useQueryClient();
 	const toast = useToast();
 
 	const [isTnCVisible, setIsTnCVisible] = useState<boolean>(false);
 	const [searchQuery, setSearchQuery] = useState("");
-	const hasHandledUrlTokenRef = useRef<boolean>(false);
 
 	const attendanceQuery = useAttendanceQuery(token);
 
@@ -36,20 +36,6 @@ function App() {
 		// Target percentage is no longer persisted; drop any leftover cookie.
 		Cookies.remove("target_percentage");
 	}, []);
-
-	useEffect(() => {
-		if (hasHandledUrlTokenRef.current) return;
-		const searchParams = new URLSearchParams(window.location.search);
-		const urlToken = searchParams.get("token");
-
-		if (urlToken) {
-			hasHandledUrlTokenRef.current = true;
-			// The extension's DNR ruleset rewrites request headers so the
-			// ERP accepts calls originating from this app.
-			window.history.replaceState({}, document.title, window.location.pathname);
-			setToken(urlToken, 7);
-		}
-	}, [setToken]);
 
 	useEffect(() => {
 		if (attendanceQuery.isError) {
@@ -91,7 +77,6 @@ function App() {
 	return (
 		<div className="app-shell">
 			{showFloatingToggle && <ThemeToggle floating />}
-			<ExtensionUpdateNotice />
 			<div className="app-main">
 				{isTnCVisible ? (
 					<TnC setIsTnCVisible={setIsTnCVisible} />
