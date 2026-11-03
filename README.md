@@ -4,12 +4,26 @@ A fast, installable web dashboard for KIET (Krishna Institute of Engineering and
 
 > **Personal project, not affiliated with CyberVidya.** Your credentials go straight from your browser to the official CyberVidya API — this app has no backend and never sees or stores them on a server. See [Privacy & Disclaimer](#privacy--disclaimer).
 
+<!-- PROJECT USAGE STATS: keep this section permanently. Do not remove. -->
+## Usage
+
+Figures from Vercel Analytics for the last 30 days (4 October 2026 to 3 November 2026), production site only:
+
+![Vercel Analytics for the last 30 days: 3,438 visitors, 8,288 page views, 55% bounce rate](docs/usage-analytics.png)
+
+| Visitors | Page views | Bounce rate |
+| --- | --- | --- |
+| **3,438** (up 624%) | **8,288** (up 774%) | **55%** (down 12%) |
+
+Changes are compared with the previous 30 days.
+<!-- END PROJECT USAGE STATS -->
+
 ## Features
 
 ### Login
 - **Username + password + OTP** — the standard flow: submit your University Roll Number and CyberVidya password, then verify the OTP sent by CyberVidya to finish logging in.
 - **Remember me** — optionally saves your username and password locally (cookies) so the credentials form is pre-filled next time; you still complete OTP verification.
-- **Browser extension auth bridge (optional)** — the *Kiet Auth Bridge* extension (Chrome/Edge/Brave and Firefox, desktop + Firefox Nightly on Android) hands the app a token it lifts directly from an active CyberVidya session, working around the ERP's CORS restrictions so the app can talk to the **live** API instead of the fallback proxy. The app detects whether the extension is installed and nudges you to update it if it's running an outdated version.
+- **Browser extension auth bridge (optional)** — the *Kiet Auth Bridge* extension (Chrome/Edge/Brave and Firefox, desktop + Firefox Nightly on Android) connects the app to your active CyberVidya session. The app detects whether the extension is installed and nudges you to update it if it's running an outdated version.
 - Session token is stored in a cookie for 7 days; if the ERP rejects it (expired/invalid), the app clears it automatically and drops you back to login with your saved credentials pre-filled.
 
 ### Dashboard
@@ -37,12 +51,9 @@ A fast, installable web dashboard for KIET (Krishna Institute of Engineering and
 
 ## How it works
 
-This is a pure client-side app — there is no backend server. Two ways it reaches CyberVidya:
+The app connects to CyberVidya for you, with no setup needed. Installing the optional *Kiet Auth Bridge* browser extension is not required.
 
-1. **Proxy mode (default)** — requests go through a small CORS-relay Cloudflare Worker (`proxy.cybervidya.workers.dev`) that forwards them to the real ERP (`kiet.cybervidya.net`), since the ERP's API doesn't allow direct cross-origin browser requests.
-2. **Live mode (via extension)** — if the *Kiet Auth Bridge* browser extension is installed, it injects a content script into the ERP page to grab your auth token from an active session and rewrites outgoing request headers (via `declarativeNetRequest`) so the browser can call `kiet.cybervidya.net` directly — no proxy in the loop.
-
-Either way, your password is AES-encrypted client-side before it's sent to CyberVidya's own login endpoint, and CyberVidya issues the session token used for every subsequent request.
+Your password is AES-encrypted client-side before it's sent to CyberVidya's own login endpoint, and CyberVidya issues the session token used for every subsequent request.
 
 ## Tech stack
 
@@ -114,7 +125,7 @@ bun run lint
 
 ## Browser extension (optional)
 
-The *Kiet Auth Bridge* extension is not required to use the app, but enables live mode instead of the proxy. It's built straight from `extension/chrome` and `extension/firefox` and packaged into release assets (`chrome.zip`, `firefox.xpi`) by the `Release Extension` GitHub Actions workflow whenever a `v*` tag is pushed. In-app, `InstallExtensionPage` walks through installing it on Chrome/Edge/Brave, Firefox, and Firefox Nightly on Android, and `ExtensionUpdateNotice` warns you in-app if your installed copy is older than `REQUIRED_EXTENSION_VERSION` (`src/types/constants.ts`).
+The *Kiet Auth Bridge* extension is not required to use the app, but gives a more direct connection. It's built straight from `extension/chrome` and `extension/firefox` and packaged into release assets (`chrome.zip`, `firefox.xpi`) by the `Release Extension` GitHub Actions workflow whenever a `v*` tag is pushed. In-app, `InstallExtensionPage` walks through installing it on Chrome/Edge/Brave, Firefox, and Firefox Nightly on Android, and `ExtensionUpdateNotice` warns you in-app if your installed copy is older than `REQUIRED_EXTENSION_VERSION` (`src/types/constants.ts`).
 
 ## Privacy & Disclaimer
 
