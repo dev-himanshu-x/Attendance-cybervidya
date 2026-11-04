@@ -4,12 +4,41 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <title>KIET Attendance - CyberVidya</title>
-    <link
-      rel="icon"
-      type="image/ico"
-      href="https://globaleducation.s3.ap-south-1.amazonaws.com/cyber-vidya/images/favicon.ico"
+    <title>KIET CyberVidya Attendance Tracker (Unofficial)</title>
+    <meta
+      name="description"
+      content="Unofficial KIET CyberVidya attendance tracker for students: overall and course-wise attendance, calendar view and a bunk planner to see how many classes you can miss."
     />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="canonical" href="https://kietcybervidya.pages.dev/" />
+    <link rel="icon" type="image/png" href="/icons/favicon.png" />
+    <link rel="apple-touch-icon" href="/icons/favicon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="KIET CyberVidya Attendance" />
+    <meta property="og:title" content="KIET CyberVidya Attendance Tracker (Unofficial)" />
+    <meta
+      property="og:description"
+      content="Unofficial KIET CyberVidya attendance tracker: course-wise attendance, calendar view and a bunk planner."
+    />
+    <meta property="og:url" content="https://kietcybervidya.pages.dev/" />
+    <meta property="og:image" content="https://kietcybervidya.pages.dev/icons/favicon.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="KIET CyberVidya Attendance Tracker (Unofficial)" />
+    <meta
+      name="twitter:description"
+      content="Unofficial KIET CyberVidya attendance tracker: course-wise attendance, calendar view and a bunk planner."
+    />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "KIET CyberVidya Attendance Tracker (Unofficial)",
+        "url": "https://kietcybervidya.pages.dev/",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Any"
+      }
+    </script>
   </head>
   <body>
     <script>
@@ -27,6 +56,15 @@
       })();
     </script>
     <div id="root"></div>
+    <noscript>
+      <h1>KIET CyberVidya Attendance Tracker (Unofficial)</h1>
+      <p>
+        An unofficial KIET CyberVidya attendance tracker: overall percentage,
+        course-wise breakdown, calendar view and a bunk planner for KIET
+        students. It is not affiliated with CyberVidya or KIET. Please enable
+        JavaScript to use it.
+      </p>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
