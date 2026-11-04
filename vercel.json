@@ -1,0 +1,10 @@
+{
+	"redirects": [
+		{
+			"source": "/(.*)",
+			"has": [{ "type": "host", "value": "cybervidyakiet.vercel.app" }],
+			"destination": "https://kietcybervidya.pages.dev/$1",
+			"permanent": true
+		}
+	]
+}
